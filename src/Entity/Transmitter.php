@@ -1,10 +1,10 @@
 <?php
 
 
-namespace App\Actor\Entity;
+namespace App\Entity;
 
 
-use App\Actor\Repository\TransmitterRepository;
+use App\Repository\TransmitterRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 /**

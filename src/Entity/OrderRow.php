@@ -1,10 +1,10 @@
 <?php
 
 
-namespace App\Order\Entity;
+namespace App\Entity;
 
 
-use App\Order\Repository\OrderRowRepository;
+use App\Repository\OrderRowRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 

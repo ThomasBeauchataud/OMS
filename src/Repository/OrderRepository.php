@@ -1,10 +1,10 @@
 <?php
 
 
-namespace App\Order\Repository;
+namespace App\Repository;
 
 
-use App\Order\Entity\Order;
+use App\Entity\Order;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -25,4 +25,5 @@ class OrderRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Order::class);
     }
+
 }

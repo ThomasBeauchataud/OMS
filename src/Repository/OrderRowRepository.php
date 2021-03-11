@@ -1,10 +1,10 @@
 <?php
 
 
-namespace App\Order\Repository;
+namespace App\Repository;
 
 
-use App\Order\Entity\OrderRow;
+use App\Entity\OrderRow;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 

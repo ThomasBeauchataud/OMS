@@ -1,10 +1,10 @@
 <?php
 
 
-namespace App\Actor\Repository;
+namespace App\Repository;
 
 
-use App\Actor\Entity\Sender;
+use App\Entity\Sender;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 

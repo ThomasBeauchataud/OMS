@@ -2,7 +2,7 @@
 
 namespace App\Entity;
 
-use App\Order\Entity\Order;
+use App\Entity\Order;
 use App\Repository\DeliveryNoteRepository;
 use Doctrine\ORM\Mapping as ORM;
 

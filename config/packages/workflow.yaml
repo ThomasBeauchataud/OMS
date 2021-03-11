@@ -1,0 +1,55 @@
+framework:
+
+    workflows:
+
+        order:
+
+            # Workflow type
+            type: workflow
+
+            # Makes the application generate detailed log messages for the workflow activity
+            audit_trail:
+                enabled: true
+
+            # Entities supporting this workflow
+            supports:
+                - App\Entity\Order
+
+            # Method setting the workflow state
+            marking_store:
+                type: method
+                property: state
+
+            # First state
+            initial_marking: created
+
+            # Workflow states
+            places:
+                - created # The order is created
+                - initialized # The order is initialized and saved
+                - preparation # The order needs some preparation
+                - ready # The order is ready to be send to a sender
+                - exported # The order is prepared by a sender
+                - delivered # The order received a delivery note
+                - closed # The delivery note has been rendered and the order workflow is closed
+
+            # Workflow transitions from a state to an other
+            transitions:
+                to_initialized:
+                    from: created
+                    to: initialized
+                to_preparation:
+                    from: initialized
+                    to: preparation
+                to_ready:
+                    from: preparation
+                    to: ready
+                to_exported:
+                    from: ready
+                    to: exported
+                to_delivered:
+                    from: exported
+                    to: delivered
+                to_closed:
+                    from: delivered
+                    to: closed

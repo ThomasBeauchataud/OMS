@@ -1,16 +1,17 @@
 <?php
 
 
-namespace App\Order\Command;
+namespace App\Command;
 
 
-use App\Actor\Entity\Transmitter;
-use App\Order\Entity\Order;
-use App\Order\Entity\OrderRow;
+use App\Entity\Transmitter;
+use App\Entity\Order;
+use App\Entity\OrderRow;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Workflow\WorkflowInterface;
 
 class OrderLoaderCommand extends Command
 {
@@ -26,13 +27,20 @@ class OrderLoaderCommand extends Command
     protected EntityManagerInterface $em;
 
     /**
+     * @var WorkflowInterface
+     */
+    protected WorkflowInterface $workflow;
+
+    /**
      * OrderLoaderCommand constructor.
      * @param EntityManagerInterface $em
+     * @param WorkflowInterface $orderWorkflow
      */
-    public function __construct(EntityManagerInterface $em)
+    public function __construct(EntityManagerInterface $em, WorkflowInterface $orderWorkflow)
     {
         parent::__construct();
         $this->em = $em;
+        $this->workflow = $orderWorkflow;
     }
 
 
@@ -67,6 +75,7 @@ class OrderLoaderCommand extends Command
                             $orderRow->setQuantity(intval($or[3]));
                             $order->addOrderRow($orderRow);
                         }
+                        $this->workflow->apply($order, 'to_initialized');
                         $this->em->persist($order);
                     }
                 }

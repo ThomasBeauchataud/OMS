@@ -1,12 +1,10 @@
 <?php
 
 
-namespace App\Order\Entity;
+namespace App\Entity;
 
 
-use App\Actor\Entity\Sender;
-use App\Actor\Entity\Transmitter;
-use App\Order\Repository\OrderRepository;
+use App\Repository\OrderRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -18,12 +16,6 @@ use Symfony\Component\Serializer\Annotation\Groups;
  */
 class Order
 {
-
-    public const STATE_CREATED = 0;
-    public const STATE_GENERATE_PICKING = 1;
-    public const STATE_WAITING_PICKING = 2;
-    public const STATE_READY = 3;
-    public const STATE_SENT = 4;
 
     /**
      * @ORM\Id
@@ -40,14 +32,14 @@ class Order
     private int $externalId;
 
     /**
-     * 0 = command created
-     * 2 = command ready
-     * 3 = command in preparation
-     * 4 = command delivered
-     *
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="boolean")
      */
-    private int $state;
+    private bool $closed;
+
+    /**
+     * @ORM\Column(type="json")
+     */
+    private array $state;
 
     /**
      * @ORM\ManyToOne(targetEntity=Transmitter::class)
@@ -60,6 +52,11 @@ class Order
     private ?Sender $sender;
 
     /**
+     * @ORM\ManyToOne(targetEntity=DeliveryNote::class, cascade={"persist", "remove"})
+     */
+    private ?DeliveryNote $deliveryNote;
+
+    /**
      * @ORM\OneToMany(targetEntity=OrderRow::class, mappedBy="order", cascade={"persist", "remove"})
      * @Groups({"order"})
      */
@@ -70,8 +67,10 @@ class Order
      */
     public function __construct()
     {
-        $this->state = 0;
+        $this->closed = false;
+        $this->state = array();
         $this->sender = null;
+        $this->deliveryNote = null;
         $this->orderRows = new ArrayCollection();
     }
 
@@ -101,20 +100,38 @@ class Order
     }
 
     /**
-     * @return int
+     * @return bool
      */
-    public function getState(): int
+    public function isClosed(): bool
+    {
+        return $this->closed;
+    }
+
+    /**
+     * @param bool $closed
+     */
+    public function setClosed(bool $closed): void
+    {
+        $this->closed = $closed;
+    }
+
+    /**
+     * @return array
+     */
+    public function getState(): array
     {
         return $this->state;
     }
 
     /**
-     * @param int $state
+     * @param array $state
      */
-    public function setState(int $state): void
+    public function setState(array $state): void
     {
         $this->state = $state;
     }
+
+
 
     /**
      * @return Transmitter
@@ -146,6 +163,22 @@ class Order
     public function setSender(Sender $sender): void
     {
         $this->sender = $sender;
+    }
+
+    /**
+     * @return DeliveryNote|null
+     */
+    public function getDeliveryNote(): ?DeliveryNote
+    {
+        return $this->deliveryNote;
+    }
+
+    /**
+     * @param DeliveryNote|null $deliveryNote
+     */
+    public function setDeliveryNote(?DeliveryNote $deliveryNote): void
+    {
+        $this->deliveryNote = $deliveryNote;
     }
 
     /**
