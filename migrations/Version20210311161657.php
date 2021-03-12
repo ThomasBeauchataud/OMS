@@ -29,7 +29,7 @@ final class Version20210311161657 extends AbstractMigration
     {
         // this down() migration is auto-generated, please modify it to your needs
         $this->addSql('ALTER TABLE `order` DROP external_id');
-        $this->addSql('ALTER TABLE order_row DROP external_id, DROP quantity');
+        $this->addSql('ALTER TABLE order_row DROP ean, DROP quantity');
         $this->addSql('ALTER TABLE transmitter CHANGE folder folder VARCHAR(255) CHARACTER SET utf8mb4 DEFAULT NULL COLLATE `utf8mb4_unicode_ci`');
     }
 }

@@ -4,14 +4,14 @@
 namespace App\Service;
 
 
-use App\Entity\Order;
+use App\Entity\WorkflowOrder;
 
 interface OrderExporterInterface
 {
 
     /**
-     * @param Order $order
+     * @param WorkflowOrder $workflowOrder
      */
-    public function exportOrder(Order $order): void;
+    public function exportOrder(WorkflowOrder $workflowOrder): void;
 
 }

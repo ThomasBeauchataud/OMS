@@ -5,22 +5,19 @@ namespace App\Command;
 
 
 use App\Entity\DeliveryNote;
-use App\Entity\Transmitter;
 use App\Entity\Order;
-use App\Entity\OrderRow;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Workflow\WorkflowInterface;
 
-class DeliveryNoteLoaderCommand extends Command
+class ImportDeliveryCommand extends Command
 {
 
     /**
      * @inheritdoc
      */
-    protected static $defaultName = "app:order:deliver";
+    protected static $defaultName = "app:import-delivery";
 
     /**
      * @var EntityManagerInterface

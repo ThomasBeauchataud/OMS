@@ -5,12 +5,13 @@ namespace App\Entity;
 
 
 use App\Repository\SenderRepository;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass=SenderRepository::class)
  */
-class Sender
+class Sender implements Picker
 {
 
     /**
@@ -21,11 +22,51 @@ class Sender
     private int $id;
 
     /**
+     * @ORM\Column(type="boolean")
+     */
+    private bool $medicineManager;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Sender::class, inversedBy="pickers")
+     * @ORM\JoinColumn(name="picker", referencedColumnName="id")
+     */
+    private Sender $client;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Sender::class, mappedBy="client")
+     */
+    private Collection $pickers;
+
+    /**
      * @return int
      */
     public function getId(): int
     {
         return $this->id;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isMedicineManager(): bool
+    {
+        return $this->medicineManager;
+    }
+
+    /**
+     * @param bool $medicineManager
+     */
+    public function setMedicineManager(bool $medicineManager): void
+    {
+        $this->medicineManager = $medicineManager;
+    }
+
+    /**
+     * @return Collection
+     */
+    public function getPickers(): Collection
+    {
+        return $this->pickers;
     }
 
 }

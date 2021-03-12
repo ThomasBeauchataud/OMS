@@ -4,7 +4,7 @@
 namespace App\Workflow;
 
 
-use App\Entity\Order;
+use App\Entity\WorkflowOrder;
 use App\Service\OrderExporterInterface;
 use App\Service\OrderRendererInterface;
 use App\Service\PreparationCreatorInterface;
@@ -80,11 +80,11 @@ class OrderWorkflowSubscriber implements EventSubscriberInterface
      */
     public function initialize(Event $event): void
     {
-        /** @var Order $order */
-        $order = $event->getSubject();
-        if ($order->getSender() === null) {
-            $sender = $this->senderSelector->selectSender($order);
-            $order->setSender($sender);
+        /** @var WorkflowOrder $workflowOrder */
+        $workflowOrder = $event->getSubject();
+        if ($workflowOrder->getSender() === null) {
+            $sender = $this->senderSelector->selectSender($workflowOrder);
+            $workflowOrder->setSender($sender);
         }
     }
 
@@ -111,9 +111,9 @@ class OrderWorkflowSubscriber implements EventSubscriberInterface
     {
         $this->saveEvent($event);
         if (!$this->continueWorkflow($event)) {
-            /** @var Order $order */
-            $order = $event->getSubject();
-            $this->preparationCreator->createPreparations($order);
+            /** @var WorkflowOrder $workflowOrder */
+            $workflowOrder = $event->getSubject();
+            $this->preparationCreator->createPreparations($workflowOrder);
         }
     }
 
@@ -137,9 +137,9 @@ class OrderWorkflowSubscriber implements EventSubscriberInterface
      */
     public function export(Event $event): void
     {
-        /** @var Order $order */
-        $order = $event->getSubject();
-        $this->orderExporter->exportOrder($order);
+        /** @var WorkflowOrder $workflowOrder */
+        $workflowOrder = $event->getSubject();
+        $this->orderExporter->exportOrder($workflowOrder);
     }
 
     /**
@@ -159,9 +159,9 @@ class OrderWorkflowSubscriber implements EventSubscriberInterface
      */
     public function deliver(Event $event): void
     {
-        /** @var Order $order */
-        $order = $event->getSubject();
-        $this->orderRenderer->render($order);
+        /** @var WorkflowOrder $workflowOrder */
+        $workflowOrder = $event->getSubject();
+        $this->orderRenderer->render($workflowOrder);
     }
 
     /**
@@ -182,10 +182,10 @@ class OrderWorkflowSubscriber implements EventSubscriberInterface
      */
     public function close(Event $event): void
     {
-        /** @var Order $order */
-        $order = $event->getSubject();
-        $order->setClosed(true);
-        $this->em->persist($order);
+        /** @var WorkflowOrder $workflowOrder */
+        $workflowOrder = $event->getSubject();
+        $workflowOrder->setClosed(true);
+        $this->em->persist($workflowOrder);
     }
 
     /**
@@ -204,11 +204,11 @@ class OrderWorkflowSubscriber implements EventSubscriberInterface
      */
     protected function continueWorkflow(Event $event): bool
     {
-        $order = $event->getSubject();
-        $transitions = $this->workflow->getEnabledTransitions($order);
+        $workflowOrder = $event->getSubject();
+        $transitions = $this->workflow->getEnabledTransitions($workflowOrder);
         foreach ($transitions as $transition) {
-            if ($this->workflow->can($order, $transition->getName())) {
-                $this->workflow->apply($order, $transition->getName());
+            if ($this->workflow->can($workflowOrder, $transition->getName())) {
+                $this->workflow->apply($workflowOrder, $transition->getName());
                 return true;
             }
         }

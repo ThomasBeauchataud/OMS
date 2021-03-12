@@ -4,21 +4,21 @@
 namespace App\Service;
 
 
-use App\Entity\Order;
+use App\Entity\WorkflowOrder;
 
 interface OrderValidatorInterface
 {
 
     /**
-     * @param Order $order
+     * @param WorkflowOrder $workflowOrder
      * @return bool
      */
-    public function validateStock(Order $order): bool;
+    public function validateStock(WorkflowOrder $workflowOrder): bool;
 
     /**
-     * @param Order $order
+     * @param WorkflowOrder $workflowOrder
      * @return bool
      */
-    public function forceExportation(Order $order): bool;
+    public function forceExportation(WorkflowOrder $workflowOrder): bool;
 
 }

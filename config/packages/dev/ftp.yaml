@@ -1,0 +1,9 @@
+parameters:
+
+    # FTP access parameters
+
+    ftp.host:
+
+    ftp.user:
+
+    ftp.password:

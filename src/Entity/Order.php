@@ -14,7 +14,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * @ORM\Entity(repositoryClass=OrderRepository::class)
  * @ORM\Table(name="`order`")
  */
-class Order
+class Order extends WorkflowOrder
 {
 
     /**
@@ -23,52 +23,41 @@ class Order
      * @ORM\Column(type="integer")
      * @Groups({"order"})
      */
-    private int $id;
+    protected int $id;
 
     /**
      * @ORM\Column(type="integer")
      * @Groups({"order"})
      */
-    private int $externalId;
-
-    /**
-     * @ORM\Column(type="boolean")
-     */
-    private bool $closed;
-
-    /**
-     * @ORM\Column(type="json")
-     */
-    private array $state;
+    protected int $externalId;
 
     /**
      * @ORM\ManyToOne(targetEntity=Transmitter::class)
      */
-    private Transmitter $transmitter;
+    protected Transmitter $transmitter;
 
     /**
      * @ORM\ManyToOne(targetEntity=Sender::class)
      */
-    private ?Sender $sender;
+    protected ?Sender $sender;
 
     /**
      * @ORM\ManyToOne(targetEntity=DeliveryNote::class, cascade={"persist", "remove"})
      */
-    private ?DeliveryNote $deliveryNote;
+    protected ?DeliveryNote $deliveryNote;
 
     /**
      * @ORM\OneToMany(targetEntity=OrderRow::class, mappedBy="order", cascade={"persist", "remove"})
      * @Groups({"order"})
      */
-    private Collection $orderRows;
+    protected Collection $orderRows;
 
     /**
      * Order constructor.
      */
     public function __construct()
     {
-        $this->closed = false;
-        $this->state = array();
+        parent::__construct();
         $this->sender = null;
         $this->deliveryNote = null;
         $this->orderRows = new ArrayCollection();
@@ -100,40 +89,6 @@ class Order
     }
 
     /**
-     * @return bool
-     */
-    public function isClosed(): bool
-    {
-        return $this->closed;
-    }
-
-    /**
-     * @param bool $closed
-     */
-    public function setClosed(bool $closed): void
-    {
-        $this->closed = $closed;
-    }
-
-    /**
-     * @return array
-     */
-    public function getState(): array
-    {
-        return $this->state;
-    }
-
-    /**
-     * @param array $state
-     */
-    public function setState(array $state): void
-    {
-        $this->state = $state;
-    }
-
-
-
-    /**
      * @return Transmitter
      */
     public function getTransmitter(): Transmitter
@@ -163,6 +118,14 @@ class Order
     public function setSender(Sender $sender): void
     {
         $this->sender = $sender;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasDeliveryNote(): bool
+    {
+        return $this->deliveryNote !== null;
     }
 
     /**
@@ -199,5 +162,4 @@ class Order
             $orderRow->setOrder($this);
         }
     }
-
 }

@@ -26,7 +26,13 @@ class OrderRow
      * @ORM\Column(type="integer")
      * @Groups({"order"})
      */
-    private int $externalId;
+    private string $product;
+
+    /**
+     * @ORM\Column(type="integer")
+     * @Groups({"order"})
+     */
+    private string $ean;
 
     /**
      * @ORM\Column(type="integer")
@@ -40,6 +46,11 @@ class OrderRow
     private Order $order;
 
     /**
+     * @ORM\Column(type="string", length=65535)
+     */
+    private string $serialization;
+
+    /**
      * @return int
      */
     public function getId(): int
@@ -48,19 +59,35 @@ class OrderRow
     }
 
     /**
-     * @return int
+     * @return string
      */
-    public function getExternalId(): int
+    public function getProduct(): string
     {
-        return $this->externalId;
+        return $this->product;
     }
 
     /**
-     * @param int $externalId
+     * @param string $product
      */
-    public function setExternalId(int $externalId): void
+    public function setProduct(string $product): void
     {
-        $this->externalId = $externalId;
+        $this->product = $product;
+    }
+
+    /**
+     * @return string
+     */
+    public function getEan(): string
+    {
+        return $this->ean;
+    }
+
+    /**
+     * @param string $ean
+     */
+    public function setEan(string $ean): void
+    {
+        $this->ean = $ean;
     }
 
     /**
@@ -93,6 +120,22 @@ class OrderRow
     public function setOrder(Order $order): void
     {
         $this->order = $order;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSerialization(): string
+    {
+        return $this->serialization;
+    }
+
+    /**
+     * @param string $serialization
+     */
+    public function setSerialization(string $serialization): void
+    {
+        $this->serialization = $serialization;
     }
 
 }

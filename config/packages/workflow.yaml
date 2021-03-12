@@ -13,7 +13,7 @@ framework:
 
             # Entities supporting this workflow
             supports:
-                - App\Entity\Order
+                - App\Entity\WorkflowOrder
 
             # Method setting the workflow state
             marking_store:

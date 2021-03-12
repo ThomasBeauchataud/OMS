@@ -13,13 +13,13 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Workflow\WorkflowInterface;
 
-class OrderLoaderCommand extends Command
+class ImportOrderCommand extends Command
 {
 
     /**
      * @inheritdoc
      */
-    protected static $defaultName = "app:order:load";
+    protected static $defaultName = "app:import-order";
 
     /**
      * @var EntityManagerInterface
@@ -49,18 +49,23 @@ class OrderLoaderCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        foreach (scandir('data') as $folder) {
+        foreach (scandir('D:\\OMS\\data') as $folder) {
             /** @var Transmitter $transmitter */
             $transmitter = $this->em->getRepository(Transmitter::class)->findOneBy(['folder' => $folder]);
             if ($transmitter !== null) {
-                foreach (scandir("data/$folder") as $file) {
+                foreach (scandir("D:\\OMS\\data/$folder") as $file) {
                     if (!str_contains($file, '.csv')) {
                         continue;
                     }
                     $orders = array();
                     ini_set('auto_detect_line_endings', TRUE);
-                    $handle = fopen("data/$folder/$file", 'r');
+                    $handle = fopen("D:\\OMS\\data/$folder/$file", 'r');
+                    $header = true;
                     while (($data = fgetcsv($handle, 0, ';')) !== FALSE) {
+                        if ($header) {
+                            $header = false;
+                            continue;
+                        }
                         $orders[$data[0]][] = $data;
                     }
                     ini_set('auto_detect_line_endings', FALSE);
@@ -71,11 +76,12 @@ class OrderLoaderCommand extends Command
                         foreach($o as $or) {
                             $orderRow = new OrderRow();
                             //TODO SET PRODUCT PATH 2
-                            $orderRow->setExternalId(intval($or[1]));
-                            $orderRow->setQuantity(intval($or[3]));
+                            $orderRow->setQuantity(intval($or[2]));
+                            $orderRow->setProduct($or[74]);
+                            $orderRow->setEan($or[73]);
+                            $orderRow->setSerialization(implode(";", $or));
                             $order->addOrderRow($orderRow);
                         }
-                        $this->workflow->apply($order, 'to_initialized');
                         $this->em->persist($order);
                     }
                 }

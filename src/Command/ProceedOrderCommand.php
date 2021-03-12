@@ -11,13 +11,13 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class RefreshOrderCommand extends Command
+class ProceedOrderCommand extends Command
 {
 
     /**
      * @inheritdoc
      */
-    protected static $defaultName = "app:order:refresh";
+    protected static $defaultName = "app:proceed";
 
     /**
      * @var EntityManagerInterface
@@ -53,8 +53,5 @@ class RefreshOrderCommand extends Command
         }
         return self::SUCCESS;
     }
-
-}
-{
 
 }

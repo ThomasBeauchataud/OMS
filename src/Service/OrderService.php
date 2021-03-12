@@ -4,12 +4,13 @@
 namespace App\Service;
 
 
-use App\Entity\Order;
 use App\Entity\Sender;
+use App\Entity\TransmitterSender;
+use App\Entity\WorkflowOrder;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
-class OrderService implements OrderExporterInterface, OrderRendererInterface, OrderValidatorInterface, SenderSelectorInterface, PreparationCreatorInterface
+class OrderService implements OrderRendererInterface, OrderValidatorInterface, SenderSelectorInterface
 {
 
     /**
@@ -35,28 +36,28 @@ class OrderService implements OrderExporterInterface, OrderRendererInterface, Or
 
 
     /**
+     * TODO
      * @inheritDoc
      */
-    public function exportOrder(Order $order): void
-    {
-        $data = $this->serializer->serialize($order, 'json', array('groups' => 'order'));
-        $file = fopen('order.txt', 'w+');
-        fwrite($file, $data);
-        fclose($file);
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function render(Order $order): void
+    public function render(WorkflowOrder $workflowOrder): void
     {
 
     }
 
     /**
+     * TODO
      * @inheritDoc
      */
-    public function validateStock(Order $order): bool
+    public function validateStock(WorkflowOrder $workflowOrder): bool
+    {
+        return false;
+    }
+
+    /**
+     * TODO
+     * @inheritDoc
+     */
+    public function forceExportation(WorkflowOrder $workflowOrder): bool
     {
         return false;
     }
@@ -64,26 +65,43 @@ class OrderService implements OrderExporterInterface, OrderRendererInterface, Or
     /**
      * @inheritDoc
      */
-    public function forceExportation(Order $order): bool
+    public function selectSender(WorkflowOrder $workflowOrder): Sender
+    {
+        $order = $workflowOrder;
+        $transmitterSenders = iterator_to_array($order->getTransmitter()->getTransmitterSenders());
+        if ($this->orderContainsMedicine($order)) {
+            $transmitterSenders = array_filter($transmitterSenders, function (TransmitterSender $transmitterSender) {
+                return $transmitterSender->getSender()->isMedicineManager();
+            });
+        }
+        $transmitterSenders = array_filter($transmitterSenders, function (TransmitterSender $transmitterSender) use ($order) {
+            return $this->senderSupportsOrder($transmitterSender->getSender(), $order);
+        });
+        usort($transmitterSenders, function (TransmitterSender $ts1, TransmitterSender $ts2) {
+            return $ts1->getPriority() < $ts2->getPriority();
+        });
+        return array_shift($transmitterSenders)->getSender();
+    }
+
+    /**
+     * TODO
+     * @param WorkflowOrder $workflowOrder
+     * @return bool
+     */
+    public function orderContainsMedicine(WorkflowOrder $workflowOrder): bool
     {
         return false;
     }
 
     /**
-     * @inheritDoc
+     * TODO
+     * @param Sender $sender
+     * @param WorkflowOrder $workflowOrder
+     * @return bool
      */
-    public function selectSender(Order $order): Sender
+    public function senderSupportsOrder(Sender $sender, WorkflowOrder $workflowOrder): bool
     {
-        /** @var Sender $sender */
-        $sender = $this->em->getRepository(Sender::class)->findOneBy([]);
-        return $sender;
+        return true;
     }
 
-    /**
-     * @param Order $order
-     */
-    public function createPreparations(Order $order): void
-    {
-        // TODO: Implement createPreparations() method.
-    }
 }

@@ -4,14 +4,14 @@
 namespace App\Service;
 
 
-use App\Entity\Order;
+use App\Entity\WorkflowOrder;
 
 interface OrderRendererInterface
 {
 
     /**
-     * @param Order $order
+     * @param WorkflowOrder $workflowOrder
      */
-    public function render(Order $order): void;
+    public function render(WorkflowOrder $workflowOrder): void;
 
 }

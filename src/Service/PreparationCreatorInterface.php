@@ -4,14 +4,14 @@
 namespace App\Service;
 
 
-use App\Entity\Order;
+use App\Entity\WorkflowOrder;
 
 interface PreparationCreatorInterface
 {
 
     /**
-     * @param Order $order
+     * @param WorkflowOrder $workflowOrder
      */
-    public function createPreparations(Order $order): void;
+    public function createPreparations(WorkflowOrder $workflowOrder): void;
 
 }

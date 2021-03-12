@@ -5,15 +5,15 @@ namespace App\Service;
 
 
 use App\Entity\Sender;
-use App\Entity\Order;
+use App\Entity\WorkflowOrder;
 
 interface SenderSelectorInterface
 {
 
     /**
-     * @param Order $order
+     * @param WorkflowOrder $workflowOrder
      * @return Sender
      */
-    public function selectSender(Order $order): Sender;
+    public function selectSender(WorkflowOrder $workflowOrder): Sender;
 
 }
