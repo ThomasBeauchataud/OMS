@@ -1,13 +1,12 @@
 <?php
 
 
-namespace App\Workflow;
+namespace App\Workflow\Order;
 
 
 use App\Entity\WorkflowOrder;
 use App\Service\OrderExporterInterface;
-use App\Service\OrderRendererInterface;
-use App\Service\PreparationCreatorInterface;
+use App\Service\PreparationFactory;
 use App\Service\SenderSelectorInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
@@ -29,19 +28,14 @@ class OrderWorkflowSubscriber implements EventSubscriberInterface
     protected OrderExporterInterface $orderExporter;
 
     /**
-     * @var OrderRendererInterface
-     */
-    protected OrderRendererInterface $orderRenderer;
-
-    /**
      * @var SenderSelectorInterface
      */
     protected SenderSelectorInterface $senderSelector;
 
     /**
-     * @var PreparationCreatorInterface
+     * @var PreparationFactory
      */
-    protected PreparationCreatorInterface $preparationCreator;
+    protected PreparationFactory $preparationFactory;
 
     /**
      * @var WorkflowInterface
@@ -54,23 +48,20 @@ class OrderWorkflowSubscriber implements EventSubscriberInterface
      * @param OrderExporterInterface $orderExporter
      * @param SenderSelectorInterface $senderSelector
      * @param WorkflowInterface $orderWorkflow
-     * @param OrderRendererInterface $orderRenderer
-     * @param PreparationCreatorInterface $preparationCreator
+     * @param PreparationFactory $preparationCreator
      */
     public function __construct(EntityManagerInterface $em,
                                 OrderExporterInterface $orderExporter,
                                 SenderSelectorInterface $senderSelector,
                                 WorkflowInterface $orderWorkflow,
-                                OrderRendererInterface $orderRenderer,
-                                PreparationCreatorInterface $preparationCreator
+                                PreparationFactory $preparationCreator
     )
     {
         $this->em = $em;
         $this->orderExporter = $orderExporter;
         $this->senderSelector = $senderSelector;
         $this->workflow = $orderWorkflow;
-        $this->orderRenderer = $orderRenderer;
-        $this->preparationCreator = $preparationCreator;
+        $this->preparationFactory = $preparationCreator;
     }
 
     /**
@@ -113,7 +104,7 @@ class OrderWorkflowSubscriber implements EventSubscriberInterface
         if (!$this->continueWorkflow($event)) {
             /** @var WorkflowOrder $workflowOrder */
             $workflowOrder = $event->getSubject();
-            $this->preparationCreator->createPreparations($workflowOrder);
+            $this->preparationFactory->createFromWorkflowOrder($workflowOrder);
         }
     }
 
@@ -139,7 +130,7 @@ class OrderWorkflowSubscriber implements EventSubscriberInterface
     {
         /** @var WorkflowOrder $workflowOrder */
         $workflowOrder = $event->getSubject();
-        $this->orderExporter->exportOrder($workflowOrder);
+        $this->orderExporter->exportToSender($workflowOrder);
     }
 
     /**
@@ -161,7 +152,7 @@ class OrderWorkflowSubscriber implements EventSubscriberInterface
     {
         /** @var WorkflowOrder $workflowOrder */
         $workflowOrder = $event->getSubject();
-        $this->orderRenderer->render($workflowOrder);
+        $this->orderExporter->exportToTransmitter($workflowOrder);
     }
 
     /**

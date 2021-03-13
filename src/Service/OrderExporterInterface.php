@@ -12,6 +12,11 @@ interface OrderExporterInterface
     /**
      * @param WorkflowOrder $workflowOrder
      */
-    public function exportOrder(WorkflowOrder $workflowOrder): void;
+    public function exportToSender(WorkflowOrder $workflowOrder): void;
+
+    /**
+     * @param WorkflowOrder $workflowOrder
+     */
+    public function exportToTransmitter(WorkflowOrder $workflowOrder): void;
 
 }

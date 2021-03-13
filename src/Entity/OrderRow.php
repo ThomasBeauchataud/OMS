@@ -41,6 +41,11 @@ class OrderRow
     private int $quantity;
 
     /**
+     * @var bool
+     */
+    private bool $medicine;
+
+    /**
      * @ORM\ManyToOne(targetEntity=Order::class, inversedBy="order")
      */
     private Order $order;
@@ -104,6 +109,22 @@ class OrderRow
     public function setQuantity(int $quantity): void
     {
         $this->quantity = $quantity;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isMedicine(): bool
+    {
+        return $this->medicine;
+    }
+
+    /**
+     * @param bool $medicine
+     */
+    public function setMedicine(bool $medicine): void
+    {
+        $this->medicine = $medicine;
     }
 
     /**

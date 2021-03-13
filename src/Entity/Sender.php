@@ -11,7 +11,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * @ORM\Entity(repositoryClass=SenderRepository::class)
  */
-class Sender implements Picker
+class Sender implements Picker, FtpActor
 {
 
     /**
@@ -25,6 +25,11 @@ class Sender implements Picker
      * @ORM\Column(type="boolean")
      */
     private bool $medicineManager;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private string $folder;
 
     /**
      * @ORM\ManyToOne(targetEntity=Sender::class, inversedBy="pickers")
@@ -43,6 +48,14 @@ class Sender implements Picker
     public function getId(): int
     {
         return $this->id;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFolder(): string
+    {
+        return $this->folder;
     }
 
     /**

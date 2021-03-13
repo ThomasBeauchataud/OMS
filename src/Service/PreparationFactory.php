@@ -5,12 +5,13 @@ namespace App\Service;
 
 
 use App\Entity\OrderRow;
+use App\Entity\Preparation;
 use App\Entity\Sender;
 use App\Entity\Stock;
 use App\Entity\WorkflowOrder;
 use Doctrine\ORM\EntityManagerInterface;
 
-class PreparationCreator implements PreparationCreatorInterface
+class PreparationFactory
 {
 
     /**
@@ -31,11 +32,11 @@ class PreparationCreator implements PreparationCreatorInterface
     /**
      * @param WorkflowOrder $workflowOrder
      */
-    public function createPreparations(WorkflowOrder $workflowOrder): void
+    public function createFromWorkflowOrder(WorkflowOrder $workflowOrder): void
     {
         foreach($workflowOrder->getOrderRows() as $orderRow) {
             $sender = $workflowOrder->getSender();
-            $senderStock = $this->getSenderStock($workflowOrder->getSender(), $orderRow);
+            $senderStock = $this->getSenderStock($sender, $orderRow);
             if ($senderStock < $orderRow->getQuantity()) {
                 $remainder = $orderRow->getQuantity() - $senderStock;
                 /** @var Sender $picker */

@@ -77,6 +77,14 @@ abstract class WorkflowOrder
     }
 
     /**
+     * @return DateTime|DateTimeInterface
+     */
+    public function getLastUpdate(): DateTime|DateTimeInterface
+    {
+        return $this->lastUpdate;
+    }
+
+    /**
      * @return Sender|null
      */
     public abstract function getSender(): ?Sender;

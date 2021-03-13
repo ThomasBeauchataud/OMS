@@ -1,38 +1,29 @@
 framework:
-
     workflows:
-
         order:
-
             # Workflow type
             type: workflow
-
             # Makes the application generate detailed log messages for the workflow activity
             audit_trail:
                 enabled: true
-
             # Entities supporting this workflow
             supports:
                 - App\Entity\WorkflowOrder
-
             # Method setting the workflow state
             marking_store:
                 type: method
                 property: state
-
             # First state
             initial_marking: created
-
             # Workflow states
             places:
                 - created # The order is created
                 - initialized # The order is initialized and saved
                 - preparation # The order needs some preparation
                 - ready # The order is ready to be send to a sender
-                - exported # The order is prepared by a sender
+                - exported # The order is exported to a sender
                 - delivered # The order received a delivery note
                 - closed # The delivery note has been rendered and the order workflow is closed
-
             # Workflow transitions from a state to an other
             transitions:
                 to_initialized:
@@ -53,3 +44,35 @@ framework:
                 to_closed:
                     from: delivered
                     to: closed
+        preparation:
+            # Workflow type
+            type: workflow
+            # Makes the application generate detailed log messages for the workflow activity
+            audit_trail:
+                enabled: true
+            # Entities supporting this workflow
+            supports:
+                - App\Entity\WorkflowPreparation
+            # Method setting the workflow state
+            marking_store:
+                type: method
+                property: state
+            # First state
+            initial_marking: created
+            # Workflow states
+            places:
+                - created # The preparation is created
+                - exported # The preparation has been exported to a picker
+                - sent # The preparation has been done by the picker
+                - received # The preparation has been received by the sender
+            # Workflow transitions from a state to an other
+            transitions:
+                to_exported:
+                    from: created
+                    to: exported
+                to_sent:
+                    from: exported
+                    to: sent
+                to_received:
+                    from: sent
+                    to: received

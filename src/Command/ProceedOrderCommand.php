@@ -5,7 +5,7 @@ namespace App\Command;
 
 
 use App\Entity\Order;
-use App\Workflow\WorkflowOrderInterface;
+use App\Workflow\Order\WorkflowOrderInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;

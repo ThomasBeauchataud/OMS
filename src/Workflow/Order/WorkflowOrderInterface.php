@@ -1,7 +1,7 @@
 <?php
 
 
-namespace App\Workflow;
+namespace App\Workflow\Order;
 
 
 use App\Entity\WorkflowOrder;

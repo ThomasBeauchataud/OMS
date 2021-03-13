@@ -5,6 +5,7 @@ namespace App\Workflow;
 
 
 use App\Entity\WorkflowOrder;
+use App\Workflow\Order\WorkflowOrderInterface;
 use Symfony\Component\Workflow\Registry;
 use Symfony\Component\Workflow\Transition;
 

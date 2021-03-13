@@ -4,19 +4,16 @@
 namespace App\Service;
 
 
+use App\Entity\OrderRow;
 use App\Entity\Sender;
+use App\Entity\Stock;
 use App\Entity\TransmitterSender;
 use App\Entity\WorkflowOrder;
+use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\Serializer\SerializerInterface;
 
-class OrderService implements OrderRendererInterface, OrderValidatorInterface, SenderSelectorInterface
+class OrderService implements OrderValidatorInterface, SenderSelectorInterface
 {
-
-    /**
-     * @var SerializerInterface
-     */
-    protected SerializerInterface $serializer;
 
     /**
      * @var EntityManagerInterface
@@ -25,41 +22,35 @@ class OrderService implements OrderRendererInterface, OrderValidatorInterface, S
 
     /**
      * OrderService constructor.
-     * @param SerializerInterface $serializer
      * @param EntityManagerInterface $em
      */
-    public function __construct(SerializerInterface $serializer, EntityManagerInterface $em)
+    public function __construct(EntityManagerInterface $em)
     {
-        $this->serializer = $serializer;
         $this->em = $em;
     }
 
-
     /**
-     * TODO
-     * @inheritDoc
-     */
-    public function render(WorkflowOrder $workflowOrder): void
-    {
-
-    }
-
-    /**
-     * TODO
      * @inheritDoc
      */
     public function validateStock(WorkflowOrder $workflowOrder): bool
     {
-        return false;
+        foreach($workflowOrder->getOrderRows() as $orderRow) {
+            $sender = $workflowOrder->getSender();
+            $senderStock = $this->getSenderStock($sender, $orderRow);
+            if ($senderStock < $orderRow->getQuantity()) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
-     * TODO
      * @inheritDoc
      */
     public function forceExportation(WorkflowOrder $workflowOrder): bool
     {
-        return false;
+        $now = new DateTime();
+        return $now->diff($workflowOrder->getLastUpdate())->h > 36;
     }
 
     /**
@@ -90,6 +81,12 @@ class OrderService implements OrderRendererInterface, OrderValidatorInterface, S
      */
     public function orderContainsMedicine(WorkflowOrder $workflowOrder): bool
     {
+        /** @var OrderRow $orderRow */
+        foreach($workflowOrder->getOrderRows() as $orderRow) {
+            if ($orderRow->isMedicine()) {
+                return true;
+            }
+        }
         return false;
     }
 
@@ -102,6 +99,22 @@ class OrderService implements OrderRendererInterface, OrderValidatorInterface, S
     public function senderSupportsOrder(Sender $sender, WorkflowOrder $workflowOrder): bool
     {
         return true;
+    }
+
+    /**
+     * @param Sender $sender
+     * @param OrderRow $orderRow
+     * @return bool
+     */
+    public function getSenderStock(Sender $sender, OrderRow $orderRow): bool
+    {
+        /** @var Stock $stock */
+        $stock = $this->em->getRepository(Stock::class)->findOneBy(array(
+            'product' => $orderRow->getProduct(),
+            'sender' => $sender,
+            'entity' => $orderRow->getOrder()->getTransmitter()->getEntity()
+        ));
+        return $stock === null ? 0 : $stock->getQuantity();
     }
 
 }
