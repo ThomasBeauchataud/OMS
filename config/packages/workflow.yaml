@@ -8,7 +8,7 @@ framework:
                 enabled: true
             # Entities supporting this workflow
             supports:
-                - App\Entity\WorkflowOrder
+                - App\Entity\Order
             # Method setting the workflow state
             marking_store:
                 type: method

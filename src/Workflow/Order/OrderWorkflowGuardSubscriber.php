@@ -4,8 +4,7 @@
 namespace App\Workflow\Order;
 
 
-use App\Entity\WorkflowOrder;
-use App\Service\OrderValidatorInterface;
+use App\Entity\Order;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Workflow\Event\GuardEvent;
 use Symfony\Component\Workflow\TransitionBlocker;
@@ -33,10 +32,13 @@ class OrderWorkflowGuardSubscriber implements EventSubscriberInterface
      */
     public function guardReady(GuardEvent $event): void
     {
-        /** @var WorkflowOrder $workflowOrder */
-        $workflowOrder = $event->getSubject();
-        if (!$this->orderValidator->validateStock($workflowOrder) && !$this->orderValidator->forceExportation($workflowOrder)) {
-            $event->addTransitionBlocker(new TransitionBlocker('WorkflowOrder not ready and not forced' , 0));
+        /** @var Order $order */
+        $order = $event->getSubject();
+        if (!$this->orderValidator->hasSenderStockForOrder($order)
+            && !$order->isForcedIncomplete()
+            && (!$this->orderValidator->forceOrderExportation($order)
+                || $this->orderValidator->hasOrderPreparationInProgress($order))) {
+            $event->addTransitionBlocker(new TransitionBlocker('Order not ready and not forced', 0));
         }
     }
 
@@ -45,10 +47,10 @@ class OrderWorkflowGuardSubscriber implements EventSubscriberInterface
      */
     public function guardDelivered(GuardEvent $event): void
     {
-        /** @var WorkflowOrder $workflowOrder */
-        $workflowOrder = $event->getSubject();
-        if (!$workflowOrder->hasDeliveryNote()) {
-            $event->addTransitionBlocker(new TransitionBlocker('Delivery note not received' , 0));
+        /** @var Order $order */
+        $order = $event->getSubject();
+        if (!$order->hasDeliveryNote()) {
+            $event->addTransitionBlocker(new TransitionBlocker('Delivery note not received', 0));
         }
     }
 

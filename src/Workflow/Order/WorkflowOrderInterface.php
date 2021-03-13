@@ -4,14 +4,14 @@
 namespace App\Workflow\Order;
 
 
-use App\Entity\WorkflowOrder;
+use App\Entity\Order;
 
 interface WorkflowOrderInterface
 {
 
     /**
-     * @param WorkflowOrder $workflowOrder
+     * @param Order $order
      */
-    public function proceed(WorkflowOrder $workflowOrder): void;
+    public function proceed(Order $order): void;
 
 }

@@ -6,7 +6,6 @@ namespace App\Entity;
 
 use App\Repository\OrderRowRepository;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass=OrderRowRepository::class)
@@ -18,32 +17,33 @@ class OrderRow
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"order"})
      */
     private int $id;
 
     /**
      * @ORM\Column(type="integer")
-     * @Groups({"order"})
      */
     private string $product;
 
     /**
      * @ORM\Column(type="integer")
-     * @Groups({"order"})
      */
     private string $ean;
 
     /**
      * @ORM\Column(type="integer")
-     * @Groups({"order"})
      */
     private int $quantity;
 
     /**
-     * @var bool
+     * @ORM\Column(type="boolean")
      */
     private bool $medicine;
+
+    /**
+     * @ORM\OneToOne(targetEntity=Preparation::class, fetch="EAGER")
+     */
+    private ?Preparation $preparation;
 
     /**
      * @ORM\ManyToOne(targetEntity=Order::class, inversedBy="order")
@@ -54,6 +54,16 @@ class OrderRow
      * @ORM\Column(type="string", length=65535)
      */
     private string $serialization;
+
+    /**
+     * OrderRow constructor.
+     */
+    public function __construct()
+    {
+        $this->medicine = false;
+        $this->preparation = null;
+    }
+
 
     /**
      * @return int
@@ -125,6 +135,22 @@ class OrderRow
     public function setMedicine(bool $medicine): void
     {
         $this->medicine = $medicine;
+    }
+
+    /**
+     * @return Preparation|null
+     */
+    public function getPreparation(): ?Preparation
+    {
+        return $this->preparation;
+    }
+
+    /**
+     * @param Preparation $preparation
+     */
+    public function setPreparation(Preparation $preparation): void
+    {
+        $this->preparation = $preparation;
     }
 
     /**

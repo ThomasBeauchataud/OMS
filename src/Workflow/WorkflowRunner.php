@@ -4,7 +4,7 @@
 namespace App\Workflow;
 
 
-use App\Entity\WorkflowOrder;
+use App\Entity\Order;
 use App\Workflow\Order\WorkflowOrderInterface;
 use Symfony\Component\Workflow\Registry;
 use Symfony\Component\Workflow\Transition;
@@ -30,14 +30,14 @@ class WorkflowRunner implements WorkflowOrderInterface
     /**
      * @inheritDoc
      */
-    public function proceed(WorkflowOrder $workflowOrder): void
+    public function proceed(Order $order): void
     {
-        $workflow = $this->workflowRegistry->get($workflowOrder);
-        $transitions = $workflow->getEnabledTransitions($workflowOrder);
+        $workflow = $this->workflowRegistry->get($order);
+        $transitions = $workflow->getEnabledTransitions($order);
         /** @var Transition $transition */
         foreach ($transitions as $transition) {
-            if ($workflow->can($workflowOrder, $transition->getName())) {
-                $workflow->apply($workflowOrder, $transition->getName());
+            if ($workflow->can($order, $transition->getName())) {
+                $workflow->apply($order, $transition->getName());
                 break;
             }
 

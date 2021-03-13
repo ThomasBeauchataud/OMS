@@ -5,7 +5,8 @@ namespace App\Service;
 
 
 use App\Entity\OrderRow;
-use App\Entity\WorkflowOrder;
+use App\Entity\Order;
+use App\Workflow\Order\OrderExporterInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class OrderExporter implements OrderExporterInterface
@@ -41,12 +42,16 @@ class OrderExporter implements OrderExporterInterface
     /**
      * @inheritDoc
      */
-    public function exportToSender(WorkflowOrder $workflowOrder): void
+    public function exportToSender(Order $order): void
     {
-        $filePath = $this->exportFolder . "\\" . $workflowOrder->getSender()->getFolder()  . $this->exportSenderFile;
+        $directoryPath = $this->exportFolder . "\\" . $order->getSender()->getAlias();
+        if (!file_exists($directoryPath)) {
+            mkdir($directoryPath, 777, true);
+        }
+        $filePath = $directoryPath . "\\" . $this->exportSenderFile;
         $file = fopen($filePath, 'w');
         /** @var OrderRow $orderRow */
-        foreach($workflowOrder->getOrderRows() as $orderRow) {
+        foreach($order->getOrderRows() as $orderRow) {
             fwrite($file, $orderRow->getSerialization());
         }
         fclose($file);
@@ -55,12 +60,12 @@ class OrderExporter implements OrderExporterInterface
     /**
      * @inheritDoc
      */
-    public function exportToTransmitter(WorkflowOrder $workflowOrder): void
+    public function exportToTransmitter(Order $order): void
     {
-        $filePath = $this->exportFolder . "\\" . $workflowOrder->getTransmitter()->getFolder() . $this->exportTransmitterFile;
+        $filePath = $this->exportFolder . "\\" . $order->getTransmitter()->getAlias() . $this->exportTransmitterFile;
         $file = fopen($filePath, 'w');
         /** @var OrderRow $orderRow */
-        foreach($workflowOrder->getOrderRows() as $orderRow) {
+        foreach($order->getOrderRows() as $orderRow) {
             fwrite($file, $orderRow->getSerialization());
         }
         fclose($file);

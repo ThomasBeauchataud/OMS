@@ -25,10 +25,15 @@ class Transmitter implements FtpActor
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private string $folder;
+    private string $name;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Entity::class)
+     * @ORM\Column(type="string", length=255)
+     */
+    private string $alias;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Entity::class, fetch="EAGER")
      */
     private Entity $entity;
 
@@ -56,17 +61,17 @@ class Transmitter implements FtpActor
     /**
      * @return string
      */
-    public function getFolder(): string
+    public function getAlias(): string
     {
-        return $this->folder;
+        return $this->alias;
     }
 
     /**
-     * @param string $folder
+     * @param string $alias
      */
-    public function setFolder(string $folder): void
+    public function setAlias(string $alias): void
     {
-        $this->folder = $folder;
+        $this->alias = $alias;
     }
 
     /**

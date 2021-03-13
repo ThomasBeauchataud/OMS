@@ -47,9 +47,16 @@ class ProceedOrderCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $orders = $this->em->getRepository(Order::class)->findBy(['closed' => false]);
+        $total = count($orders);
+        $output->writeln("Running workflow on $total commands.");
+        $count = 0;
         /** @var Order $order */
-        foreach($this->em->getRepository(Order::class)->findBy(['closed' => false]) as $order) {
+        foreach($orders as $order) {
+            $count += 1;
             $this->workflow->proceed($order);
+            $percent = intval(($count / $total) * 100);
+            $output->write("\r$percent%");
         }
         return self::SUCCESS;
     }

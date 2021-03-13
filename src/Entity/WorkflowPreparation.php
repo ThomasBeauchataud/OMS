@@ -15,6 +15,11 @@ abstract class WorkflowPreparation
 {
 
     /**
+     * @ORM\Column(type="boolean")
+     */
+    protected bool $closed;
+
+    /**
      * @ORM\Column(type="json")
      */
     protected array $state;
@@ -25,12 +30,29 @@ abstract class WorkflowPreparation
     protected DateTimeInterface $lastUpdate;
 
     /**
-     * WorkflowOrder constructor.
+     * Order constructor.
      */
     public function __construct()
     {
+        $this->closed = false;
         $this->state = array();
         $this->lastUpdate = new DateTime();
+    }
+
+    /**
+     * @return bool
+     */
+    public function isClosed(): bool
+    {
+        return $this->closed;
+    }
+
+    /**
+     * @param bool $closed
+     */
+    public function setClosed(bool $closed): void
+    {
+        $this->closed = $closed;
     }
 
     /**

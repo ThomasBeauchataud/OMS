@@ -7,6 +7,9 @@ namespace App\Entity;
 interface FtpActor
 {
 
-    public function getFolder(): string;
+    /**
+     * @return string
+     */
+    public function getAlias(): string;
 
 }

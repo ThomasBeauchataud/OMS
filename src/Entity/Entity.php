@@ -25,6 +25,11 @@ class Entity
     private string $name;
 
     /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private string $alias;
+
+    /**
      * @return int
      */
     public function getId(): int
@@ -46,5 +51,13 @@ class Entity
     public function setName(string $name): void
     {
         $this->name = $name;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAlias(): string
+    {
+        return $this->alias;
     }
 }

@@ -31,14 +31,9 @@ class Preparation extends WorkflowPreparation
     private int $quantity;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Sender::class)
+     * @ORM\ManyToOne(targetEntity=Picker::class)
      */
     private Picker $picker;
-
-    /**
-     * @ORM\ManyToOne(targetEntity=Sender::class)
-     */
-    private Sender $client;
 
     /**
      * @return int
@@ -94,22 +89,6 @@ class Preparation extends WorkflowPreparation
     public function setPicker(Picker $picker): void
     {
         $this->picker = $picker;
-    }
-
-    /**
-     * @return Sender
-     */
-    public function getClient(): Sender
-    {
-        return $this->client;
-    }
-
-    /**
-     * @param Sender $client
-     */
-    public function setClient(Sender $client): void
-    {
-        $this->client = $client;
     }
 
 }

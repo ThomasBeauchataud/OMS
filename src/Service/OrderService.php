@@ -6,13 +6,12 @@ namespace App\Service;
 
 use App\Entity\OrderRow;
 use App\Entity\Sender;
-use App\Entity\Stock;
 use App\Entity\TransmitterSender;
-use App\Entity\WorkflowOrder;
-use DateTime;
+use App\Entity\Order;
+use App\Workflow\Order\SenderSelectorInterface;
 use Doctrine\ORM\EntityManagerInterface;
 
-class OrderService implements OrderValidatorInterface, SenderSelectorInterface
+class OrderService implements SenderSelectorInterface
 {
 
     /**
@@ -32,33 +31,8 @@ class OrderService implements OrderValidatorInterface, SenderSelectorInterface
     /**
      * @inheritDoc
      */
-    public function validateStock(WorkflowOrder $workflowOrder): bool
+    public function selectSenderForOrder(Order $order): Sender
     {
-        foreach($workflowOrder->getOrderRows() as $orderRow) {
-            $sender = $workflowOrder->getSender();
-            $senderStock = $this->getSenderStock($sender, $orderRow);
-            if ($senderStock < $orderRow->getQuantity()) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function forceExportation(WorkflowOrder $workflowOrder): bool
-    {
-        $now = new DateTime();
-        return $now->diff($workflowOrder->getLastUpdate())->h > 36;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function selectSender(WorkflowOrder $workflowOrder): Sender
-    {
-        $order = $workflowOrder;
         $transmitterSenders = iterator_to_array($order->getTransmitter()->getTransmitterSenders());
         if ($this->orderContainsMedicine($order)) {
             $transmitterSenders = array_filter($transmitterSenders, function (TransmitterSender $transmitterSender) {
@@ -69,20 +43,20 @@ class OrderService implements OrderValidatorInterface, SenderSelectorInterface
             return $this->senderSupportsOrder($transmitterSender->getSender(), $order);
         });
         usort($transmitterSenders, function (TransmitterSender $ts1, TransmitterSender $ts2) {
-            return $ts1->getPriority() < $ts2->getPriority();
+            return $ts1->getPriority() <=> $ts2->getPriority();
         });
         return array_shift($transmitterSenders)->getSender();
     }
 
     /**
      * TODO
-     * @param WorkflowOrder $workflowOrder
+     * @param Order $order
      * @return bool
      */
-    public function orderContainsMedicine(WorkflowOrder $workflowOrder): bool
+    public function orderContainsMedicine(Order $order): bool
     {
         /** @var OrderRow $orderRow */
-        foreach($workflowOrder->getOrderRows() as $orderRow) {
+        foreach($order->getOrderRows() as $orderRow) {
             if ($orderRow->isMedicine()) {
                 return true;
             }
@@ -93,28 +67,12 @@ class OrderService implements OrderValidatorInterface, SenderSelectorInterface
     /**
      * TODO
      * @param Sender $sender
-     * @param WorkflowOrder $workflowOrder
+     * @param Order $order
      * @return bool
      */
-    public function senderSupportsOrder(Sender $sender, WorkflowOrder $workflowOrder): bool
+    public function senderSupportsOrder(Sender $sender, Order $order): bool
     {
         return true;
-    }
-
-    /**
-     * @param Sender $sender
-     * @param OrderRow $orderRow
-     * @return bool
-     */
-    public function getSenderStock(Sender $sender, OrderRow $orderRow): bool
-    {
-        /** @var Stock $stock */
-        $stock = $this->em->getRepository(Stock::class)->findOneBy(array(
-            'product' => $orderRow->getProduct(),
-            'sender' => $sender,
-            'entity' => $orderRow->getOrder()->getTransmitter()->getEntity()
-        ));
-        return $stock === null ? 0 : $stock->getQuantity();
     }
 
 }

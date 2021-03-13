@@ -26,4 +26,71 @@ class OrderRepository extends ServiceEntityRepository
         parent::__construct($registry, Order::class);
     }
 
+
+    /**
+     * @param Order $order
+     */
+    public function updateState(Order $order): void
+    {
+        $this->createQueryBuilder("o")
+            ->update()
+            ->set('o.state', ':state')
+            ->set('o.lastUpdate', ':update')
+            ->where('o.id = :id')
+            ->setParameter('state', json_encode($order->getState()))
+            ->setParameter('update', $order->getLastUpdate()->format('Y-m-d h:i:s'))
+            ->setParameter('id', $order->getId())
+            ->getQuery()
+            ->execute();
+    }
+
+    /**
+     * @param Order $order
+     */
+    public function updateClosed(Order $order): void
+    {
+        $this->createQueryBuilder("o")
+            ->update()
+            ->set('o.closed', ':closed')
+            ->where('o.id = :id')
+            ->setParameter('closed', $order->isClosed())
+            ->setParameter('id', $order->getId())
+            ->getQuery()
+            ->execute();
+    }
+
+    /**
+     * @param Order $order
+     */
+    public function updateStateAndIncomplete(Order $order): void
+    {
+        $this->createQueryBuilder("o")
+            ->update()
+            ->set('o.state', ':state')
+            ->set('o.lastUpdate', ':update')
+            ->set('o.forcedIncomplete', ':incomplete')
+            ->where('o.id = :id')
+            ->setParameter('state', json_encode($order->getState()))
+            ->setParameter('update', $order->getLastUpdate()->format('Y-m-d h:i:s'))
+            ->setParameter('incomplete', $order->isForcedIncomplete())
+            ->setParameter('id', $order->getId())
+            ->getQuery()
+            ->execute();
+    }
+
+    /**
+     * @param Order $order
+     */
+    public function updateSender(Order $order): void
+    {
+        $this->createQueryBuilder("o")
+            ->update()
+            ->set('o.sender', ':sender')
+            ->where('o.id = :id')
+            ->setParameter('sender', $order->getSender())
+            ->setParameter('id', $order->getId())
+            ->getQuery()
+            ->execute();
+    }
+    
 }

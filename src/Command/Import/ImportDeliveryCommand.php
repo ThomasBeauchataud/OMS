@@ -1,7 +1,7 @@
 <?php
 
 
-namespace App\Command;
+namespace App\Command\Import;
 
 
 use App\Entity\DeliveryNote;

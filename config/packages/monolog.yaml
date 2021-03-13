@@ -1,0 +1,14 @@
+monolog:
+    handlers:
+        doctrine:
+            level: debug
+            type: rotating_file
+            path: '%kernel.logs_dir%/%kernel.environment%/doctrine.log'
+            max_files: 3
+            channels: [ doctrine ]
+        main:
+            type: rotating_file
+            path: "%kernel.logs_dir%/%kernel.environment%/%kernel.environment%.log"
+            level: debug
+            max_files: 3
+            channels: [ "!doctrine" , "!request" ]

@@ -4,13 +4,20 @@
 namespace App\Service;
 
 
+use App\Entity\Order;
 use App\Entity\OrderRow;
+use App\Entity\Picker;
 use App\Entity\Preparation;
 use App\Entity\Sender;
 use App\Entity\Stock;
-use App\Entity\WorkflowOrder;
 use Doctrine\ORM\EntityManagerInterface;
 
+/**
+ * Create a preparation from an order and save it
+ *
+ * Class PreparationFactory
+ * @package App\Service
+ */
 class PreparationFactory
 {
 
@@ -30,18 +37,24 @@ class PreparationFactory
 
 
     /**
-     * @param WorkflowOrder $workflowOrder
+     * @param Order $order
+     * @return bool
      */
-    public function createFromWorkflowOrder(WorkflowOrder $workflowOrder): void
+    public function createFromWorkflowOrder(Order $order): bool
     {
-        foreach($workflowOrder->getOrderRows() as $orderRow) {
-            $sender = $workflowOrder->getSender();
-            $senderStock = $this->getSenderStock($sender, $orderRow);
+        $output = false;
+        $sender = $order->getSender();
+        $pickers = $sender->getPickers();
+        /** @var Stock[] $stocks */
+        $stocks = $this->em->getRepository(Stock::class)->findBySenderEntityProduct($order);
+        /** @var OrderRow $orderRow */
+        foreach ($order->getOrderRows() as $orderRow) {
+            $senderStock = array_key_exists($orderRow->getProduct(), $stocks) ? $stocks[$orderRow->getProduct()]->getQuantity() : 0;
             if ($senderStock < $orderRow->getQuantity()) {
                 $remainder = $orderRow->getQuantity() - $senderStock;
-                /** @var Sender $picker */
-                foreach($sender->getPickers() as $picker) {
-                    $pickerStock = $this->getSenderStock($picker, $orderRow);
+                /** @var Picker $picker */
+                foreach ($pickers as $picker) {
+                    $pickerStock = $this->getSenderStock($picker->getPreparer(), $orderRow, $order);
                     if ($pickerStock > $remainder) {
                         $preparationQuantity = $remainder;
                     } else {
@@ -52,25 +65,32 @@ class PreparationFactory
                     $preparation->setPicker($picker);
                     $preparation->setProduct($orderRow->getProduct());
                     $preparation->setQuantity($preparationQuantity);
+                    $orderRow->setPreparation($preparation);
                     $this->em->persist($preparation);
+                    $output = true;
                 }
             }
         }
-        $this->em->flush();
+        if ($output) {
+            $this->em->flush();
+        }
+        return $output;
+
     }
 
     /**
      * @param Sender $sender
      * @param OrderRow $orderRow
+     * @param Order $order
      * @return bool
      */
-    public function getSenderStock(Sender $sender, OrderRow $orderRow): bool
+    public function getSenderStock(Sender $sender, OrderRow $orderRow, Order $order): bool
     {
         /** @var Stock $stock */
         $stock = $this->em->getRepository(Stock::class)->findOneBy(array(
             'product' => $orderRow->getProduct(),
             'sender' => $sender,
-            'entity' => $orderRow->getOrder()->getTransmitter()->getEntity()
+            'entity' => $order->getTransmitter()->getEntity()
         ));
         return $stock === null ? 0 : $stock->getQuantity();
     }

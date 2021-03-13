@@ -1,7 +1,13 @@
 <?php
 
+
 namespace App\Repository;
 
+
+use App\Entity\Entity;
+use App\Entity\Order;
+use App\Entity\OrderRow;
+use App\Entity\Sender;
 use App\Entity\Stock;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -14,37 +20,57 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class StockRepository extends ServiceEntityRepository
 {
+
+    /**
+     * StockRepository constructor.
+     * @param ManagerRegistry $registry
+     */
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Stock::class);
     }
 
-    // /**
-    //  * @return Stock[] Returns an array of Stock objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    /**
+     * @param Sender $sender
+     * @param Entity $entity
+     */
+    public function removeFromSenderEntity(Sender $sender, Entity $entity): void
     {
-        return $this->createQueryBuilder('s')
-            ->andWhere('s.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('s.id', 'ASC')
-            ->setMaxResults(10)
+        $this->createQueryBuilder('s')
+            ->delete()
+            ->where('s.entity = :entity')
+            ->andWhere('s.sender = :sender')
+            ->setParameter('sender', $sender)
+            ->setParameter('entity', $entity)
             ->getQuery()
-            ->getResult()
-        ;
+            ->execute();
     }
-    */
 
-    /*
-    public function findOneBySomeField($value): ?Stock
+    /**
+     * @param Order $order
+     * @return Stock[]
+     */
+    public function findBySenderEntityProduct(Order $order): array
     {
-        return $this->createQueryBuilder('s')
-            ->andWhere('s.exampleField = :val')
-            ->setParameter('val', $value)
+        $products = array_map(function (OrderRow $orderRow) {
+            return $orderRow->getProduct();
+        }, iterator_to_array($order->getOrderRows()));
+        $responses = $this->createQueryBuilder('st')
+            ->leftJoin('st.sender', 'se')
+            ->leftJoin('st.entity', 'e')
+            ->where('e = :entity')
+            ->andWhere('se = :sender')
+            ->andWhere('st.product IN (:products)')
+            ->setParameter('sender', $order->getSender())
+            ->setParameter('entity', $order->getTransmitter()->getEntity())
+            ->setParameter('products', $products)
             ->getQuery()
-            ->getOneOrNullResult()
-        ;
+            ->getResult();
+        $output = array();
+        foreach($responses as $response) {
+            $output[$response->getProduct()] = $response;
+        }
+        return $output;
     }
-    */
+
 }
