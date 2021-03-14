@@ -6,6 +6,7 @@ namespace App\Entity;
 
 use App\Repository\OrderRowRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=OrderRowRepository::class)
@@ -21,17 +22,20 @@ class OrderRow
     private int $id;
 
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="string")
+     * @Assert\NotNull()
      */
     private string $product;
 
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="string")
+     * @Assert\NotNull()
      */
     private string $ean;
 
     /**
      * @ORM\Column(type="integer")
+     * @Assert\NotNull()
      */
     private int $quantity;
 

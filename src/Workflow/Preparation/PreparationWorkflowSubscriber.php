@@ -36,7 +36,7 @@ class PreparationWorkflowSubscriber implements EventSubscriberInterface
      */
     public function __construct(EntityManagerInterface $em,
                                 PreparationExporterInterface $preparationExporter,
-                                WorkflowInterface $preparationWorkflow,
+                                WorkflowInterface $preparationWorkflow
     )
     {
         $this->em = $em;

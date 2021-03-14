@@ -5,7 +5,7 @@ namespace App\Command;
 
 
 use App\Entity\Order;
-use App\Workflow\Order\WorkflowOrderInterface;
+use App\Workflow\Order\OrderWorkflowInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -25,16 +25,16 @@ class ProceedOrderCommand extends Command
     protected EntityManagerInterface $em;
 
     /**
-     * @var WorkflowOrderInterface
+     * @var OrderWorkflowInterface
      */
-    protected WorkflowOrderInterface $workflow;
+    protected OrderWorkflowInterface $workflow;
 
     /**
      * OrderLoaderCommand constructor.
      * @param EntityManagerInterface $em
-     * @param WorkflowOrderInterface $orderWorkflow
+     * @param OrderWorkflowInterface $orderWorkflow
      */
-    public function __construct(EntityManagerInterface $em, WorkflowOrderInterface $orderWorkflow)
+    public function __construct(EntityManagerInterface $em, OrderWorkflowInterface $orderWorkflow)
     {
         parent::__construct();
         $this->em = $em;

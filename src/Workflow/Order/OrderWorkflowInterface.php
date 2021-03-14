@@ -6,7 +6,7 @@ namespace App\Workflow\Order;
 
 use App\Entity\Order;
 
-interface WorkflowOrderInterface
+interface OrderWorkflowInterface
 {
 
     /**

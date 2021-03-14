@@ -1,0 +1,4 @@
+POST localhost:8000/api/order/import
+Content-Type: application/json
+
+{"externalId": 2, "orderRows": [{"product": "20", "quantity": 10}]}

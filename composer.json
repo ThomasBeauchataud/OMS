@@ -6,10 +6,12 @@
     "minimum-stability": "dev",
     "prefer-stable": true,
     "require": {
-        "php": ">=8.0",
+        "php": ">=7.4.9",
+        "ext-amqp": "*",
         "ext-ctype": "*",
         "ext-ftp": "*",
         "ext-iconv": "*",
+        "ext-json": "*",
         "doctrine/annotations": "^1.0",
         "doctrine/doctrine-bundle": "^2.2",
         "doctrine/doctrine-migrations-bundle": "^3.0",
@@ -25,6 +27,7 @@
         "symfony/property-info": "^5.2",
         "symfony/proxy-manager-bridge": "^5.2",
         "symfony/serializer": "^5.2",
+        "symfony/validator": "^5.2",
         "symfony/workflow": "^5.2",
         "symfony/yaml": "^5.2"
     },

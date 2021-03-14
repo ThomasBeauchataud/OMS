@@ -10,7 +10,7 @@ use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=OrderRepository::class)
@@ -20,37 +20,49 @@ class Order
 {
 
     /**
+     * The id of the order defined by the OMS
+     *
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"order"})
      */
     protected int $id;
 
     /**
+     * The id defined to by transmitter of the order, used to communicate with the transmitter about the order
+     *
      * @ORM\Column(type="integer")
-     * @Groups({"order"})
+     * @Assert\NotNull()
      */
     protected int $externalId;
 
     /**
+     * The transmitter who sent the order to this OMS
+     *
      * @ORM\ManyToOne(targetEntity=Transmitter::class, fetch="EAGER")
+     * @Assert\NotNull()
      */
     protected Transmitter $transmitter;
 
     /**
+     * The defined sender of the order, who is defined at the initialisation of the workflow
+     *
      * @ORM\ManyToOne(targetEntity=Sender::class, fetch="EAGER")
      */
     protected ?Sender $sender;
 
     /**
-     * @ORM\ManyToOne(targetEntity=DeliveryNote::class, cascade={"persist", "remove"})
+     * The delivery note received from the sender of the order when the order is delivered
+     *
+     * @ORM\OneToOne(targetEntity=DeliveryNote::class, fetch="EAGER", cascade={"persist", "remove"})
      */
     protected ?DeliveryNote $deliveryNote;
 
     /**
+     * The order rows of the order containing product with their quantities ordered
+     *
      * @ORM\OneToMany(targetEntity=OrderRow::class, mappedBy="order", fetch="EAGER", cascade={"persist", "remove"})
-     * @Groups({"order"})
+     * @Assert\Valid()
      */
     protected Collection $orderRows;
 
@@ -82,6 +94,14 @@ class Order
      */
     protected bool $forcedIncomplete;
 
+
+    /*****************************************
+     *****************************************
+     ************** CONSTRUCTOR **************
+     *****************************************
+     *****************************************/
+
+
     /**
      * Order constructor.
      */
@@ -95,6 +115,13 @@ class Order
         $this->deliveryNote = null;
         $this->orderRows = new ArrayCollection();
     }
+
+
+    /*****************************************
+     *****************************************
+     ********* ATTRIBUTES ACCESSORS **********
+     *****************************************
+     *****************************************/
 
 
     /**
@@ -186,6 +213,16 @@ class Order
     }
 
     /**
+     * @param Collection|array $orderRows
+     */
+    public function setOrderRows($orderRows): void
+    {
+        foreach ($orderRows as $orderRow) {
+            $this->addOrderRow($orderRow);
+        }
+    }
+
+    /**
      * @param OrderRow $orderRow
      */
     public function addOrderRow(OrderRow $orderRow): void
@@ -194,6 +231,28 @@ class Order
             $this->orderRows->add($orderRow);
             $orderRow->setOrder($this);
         }
+    }
+
+
+    /*****************************************
+     *****************************************
+     **************** METHODS ****************
+     *****************************************
+     *****************************************/
+
+
+    /**
+     * @return bool
+     */
+    public function containsMedicine(): bool
+    {
+        /** @var OrderRow $orderRow */
+        foreach ($this->orderRows as $orderRow) {
+            if ($orderRow->isMedicine()) {
+                return true;
+            }
+        }
+        return false;
     }
 
 
@@ -240,27 +299,30 @@ class Order
     }
 
     /**
-     * @return DateTime|DateTimeInterface
+     * @return DateTimeInterface
      */
-    public function getLastUpdate(): DateTime|DateTimeInterface
+    public function getLastUpdate(): DateTimeInterface
     {
         return $this->lastUpdate;
     }
 
-    /**
-     * @return bool
-     */
-    public function isForcedIncomplete(): bool
-    {
-        return $this->forcedIncomplete;
-    }
+
+    /*****************************************
+     *****************************************
+     *********** WORKFLOW METHODS ************
+     *****************************************
+     *****************************************/
+
 
     /**
-     * @param bool $forcedIncomplete
+     * Returns true when the order has to be exported to sender no matter what
+     *
+     * @return bool
      */
-    public function setForcedIncomplete(bool $forcedIncomplete): void
+    public function forceReadyState(): bool
     {
-        $this->forcedIncomplete = $forcedIncomplete;
+        $now = new DateTime();
+        return $now->diff($this->getLastUpdate())->h > 36;
     }
 
 }

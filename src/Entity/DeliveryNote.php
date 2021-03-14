@@ -1,6 +1,8 @@
 <?php
 
+
 namespace App\Entity;
+
 
 use App\Entity\Order;
 use App\Repository\DeliveryNoteRepository;

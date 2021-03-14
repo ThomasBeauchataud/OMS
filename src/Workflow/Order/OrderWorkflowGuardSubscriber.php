@@ -9,23 +9,14 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Workflow\Event\GuardEvent;
 use Symfony\Component\Workflow\TransitionBlocker;
 
+/**
+ * Prevent an order the pass to the next workflow state
+ *
+ * Class OrderWorkflowGuardSubscriber
+ * @package App\Workflow\Order
+ */
 class OrderWorkflowGuardSubscriber implements EventSubscriberInterface
 {
-
-    /**
-     * @var OrderValidatorInterface
-     */
-    protected OrderValidatorInterface $orderValidator;
-
-    /**
-     * OrderWorkflowGuardSubscriber constructor.
-     * @param OrderValidatorInterface $orderValidator
-     */
-    public function __construct(OrderValidatorInterface $orderValidator)
-    {
-        $this->orderValidator = $orderValidator;
-    }
-
 
     /**
      * @param GuardEvent $event
@@ -34,11 +25,11 @@ class OrderWorkflowGuardSubscriber implements EventSubscriberInterface
     {
         /** @var Order $order */
         $order = $event->getSubject();
-        if (!$this->orderValidator->hasSenderStockForOrder($order)
-            && !$order->isForcedIncomplete()
-            && (!$this->orderValidator->forceOrderExportation($order)
-                || $this->orderValidator->hasOrderPreparationInProgress($order))) {
-            $event->addTransitionBlocker(new TransitionBlocker('Order not ready and not forced', 0));
+        foreach($order->getOrderRows() as $orderRow) {
+            $preparation = $orderRow->getPreparation();
+            if ($preparation !== null && !$preparation->isClosed() && !$order->forceReadyState()) {
+                $event->addTransitionBlocker(new TransitionBlocker('Order has preparation in progress', 0));
+            }
         }
     }
 

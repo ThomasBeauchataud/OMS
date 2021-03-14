@@ -5,11 +5,10 @@ namespace App\Workflow;
 
 
 use App\Entity\Order;
-use App\Workflow\Order\WorkflowOrderInterface;
+use App\Workflow\Order\OrderWorkflowInterface;
 use Symfony\Component\Workflow\Registry;
-use Symfony\Component\Workflow\Transition;
 
-class WorkflowRunner implements WorkflowOrderInterface
+class RunnerWorkflow implements OrderWorkflowInterface
 {
 
     /**
@@ -33,14 +32,9 @@ class WorkflowRunner implements WorkflowOrderInterface
     public function proceed(Order $order): void
     {
         $workflow = $this->workflowRegistry->get($order);
-        $transitions = $workflow->getEnabledTransitions($order);
-        /** @var Transition $transition */
-        foreach ($transitions as $transition) {
-            if ($workflow->can($order, $transition->getName())) {
-                $workflow->apply($order, $transition->getName());
-                break;
-            }
-
+        while(count($transitions = $workflow->getEnabledTransitions($order)) != 0) {
+            $transition = array_shift($transitions);
+            $workflow->apply($order, $transition->getName());
         }
     }
 

@@ -12,7 +12,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * @ORM\Entity(repositoryClass=TransmitterRepository::class)
  */
-class Transmitter implements FtpActor
+class Transmitter
 {
 
     /**
