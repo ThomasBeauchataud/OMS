@@ -12,12 +12,12 @@ namespace App\Command\Import;
 use App\Entity\Entity;
 use App\Entity\Sender;
 use App\Entity\Stock;
+use App\Service\Stock\StockManagerInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
-use Symfony\Component\Workflow\WorkflowInterface;
 
 class ImportStockCommand extends Command
 {
@@ -35,9 +35,9 @@ class ImportStockCommand extends Command
     protected EntityManagerInterface $em;
 
     /**
-     * @var WorkflowInterface
+     * @var StockManagerInterface
      */
-    protected WorkflowInterface $workflow;
+    protected StockManagerInterface $stockManager;
 
     /**
      * @var ParameterBagInterface
@@ -47,14 +47,14 @@ class ImportStockCommand extends Command
     /**
      * OrderLoaderCommand constructor.
      * @param EntityManagerInterface $em
-     * @param WorkflowInterface $orderWorkflow
+     * @param StockManagerInterface $stockManager
      * @param ParameterBagInterface $parameterBag
      */
-    public function __construct(EntityManagerInterface $em, WorkflowInterface $orderWorkflow, ParameterBagInterface $parameterBag)
+    public function __construct(EntityManagerInterface $em, StockManagerInterface $stockManager, ParameterBagInterface $parameterBag)
     {
         parent::__construct();
         $this->em = $em;
-        $this->workflow = $orderWorkflow;
+        $this->stockManager = $stockManager;
         $this->parameterBag = $parameterBag;
     }
 
@@ -75,9 +75,8 @@ class ImportStockCommand extends Command
                     if ($entity !== null) {
                         foreach (scandir("$baseFolder/$senderAlias/$entityAlias") as $file) {
                             if ($file === self::FILE_NAME) {
-                                $this->em->getRepository(Stock::class)->removeFromSenderEntity($sender, $entity);
-                                $this->createStocks($sender, $entity, "$baseFolder/$senderAlias/$entityAlias/$file");
-                                $this->em->flush();
+                                $stocks = $this->createStocks($sender, $entity, "$baseFolder/$senderAlias/$entityAlias/$file");
+                                $this->stockManager->importStocks($stocks, $sender, $entity);
                             }
                         }
                     }
@@ -91,11 +90,11 @@ class ImportStockCommand extends Command
      * @param Sender $sender
      * @param Entity $entity
      * @param string $filePath
+     * @return Stock[]
      */
-    private function createStocks(Sender $sender, Entity $entity, string $filePath): void
+    private function createStocks(Sender $sender, Entity $entity, string $filePath): array
     {
-        var_dump($sender->getAlias());
-        var_dump($filePath);
+        $stocks = array();
         ini_set('auto_detect_line_endings', TRUE);
         $handle = fopen($filePath, 'r');
         $header = true;
@@ -117,9 +116,10 @@ class ImportStockCommand extends Command
             $stock->setSender($sender);
             $stock->setQuantity($quantity);
             $stock->setProduct($data[0]);
-            $this->em->persist($stock);
+            $stocks[] = $stock;
         }
         ini_set('auto_detect_line_endings', FALSE);
+        return $stocks;
     }
 
 }

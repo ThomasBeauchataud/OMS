@@ -10,10 +10,10 @@ namespace App\Workflow;
 
 
 use App\Entity\Order;
-use App\Workflow\Order\OrderWorkflowInterface;
+use App\Entity\Preparation;
 use Symfony\Component\Workflow\Registry;
 
-class RunnerWorkflow implements OrderWorkflowInterface
+class RunnerWorkflow
 {
 
     /**
@@ -32,14 +32,30 @@ class RunnerWorkflow implements OrderWorkflowInterface
 
 
     /**
-     * @inheritDoc
+     * @param Order $order
      */
-    public function proceed(Order $order): void
+    public function proceedOrder(Order $order): void
     {
-        $workflow = $this->workflowRegistry->get($order);
-        while(count($transitions = $workflow->getEnabledTransitions($order)) != 0) {
+        $this->proceed($order);
+    }
+
+    /**
+     * @param Preparation $preparation
+     */
+    public function proceedPreparation(Preparation $preparation): void
+    {
+        $this->proceed($preparation);
+    }
+
+    /**
+     * @param $object
+     */
+    protected function proceed($object): void
+    {
+        $workflow = $this->workflowRegistry->get($object);
+        while(count($transitions = $workflow->getEnabledTransitions($object)) != 0) {
             $transition = array_shift($transitions);
-            $workflow->apply($order, $transition->getName());
+            $workflow->apply($object, $transition->getName());
         }
     }
 

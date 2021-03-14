@@ -5,5 +5,5 @@ echo "listen.owner = nginx" >> /etc/php/7.4/fpm/php-fpm.conf
 echo "listen.group = nginx" >> /etc/php/7.4/fpm/php-fpm.conf
 chmod 777 -R /app/
 /usr/sbin/nginx
-/usr/sbin/php-fpm8.0
+/usr/sbin/php-fpm7.4
 tail -f /var/log/nginx/access.log

@@ -47,6 +47,11 @@ class Sender
     private Collection $pickers;
 
     /**
+     * @ORM\OneToMany(targetEntity=Picker::class, mappedBy="preparer", fetch="EAGER")
+     */
+    private Collection $clients;
+
+    /**
      * @return int
      */
     public function getId(): int
@@ -92,6 +97,22 @@ class Sender
     public function getPickers(): Collection
     {
         return $this->pickers;
+    }
+
+    /**
+     * @return Collection
+     */
+    public function getClients(): Collection
+    {
+        return $this->clients;
+    }
+
+    /**
+     * @param Collection $clients
+     */
+    public function setClients(Collection $clients): void
+    {
+        $this->clients = $clients;
     }
 
 }

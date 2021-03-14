@@ -18,16 +18,23 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class DeliveryNote
 {
+
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      */
-    private $id;
+    private int $id;
 
+    /**
+     * @var \App\Entity\Order
+     */
     private Order $order;
 
-    public function getId(): ?int
+    /**
+     * @return int
+     */
+    public function getId(): int
     {
         return $this->id;
     }

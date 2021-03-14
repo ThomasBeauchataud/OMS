@@ -50,7 +50,7 @@ class OrderRow
     private bool $medicine;
 
     /**
-     * @ORM\OneToOne(targetEntity=Preparation::class, fetch="EAGER")
+     * @ORM\OneToOne(targetEntity=Preparation::class, inversedBy="orderRow", fetch="EAGER")
      */
     private ?Preparation $preparation;
 

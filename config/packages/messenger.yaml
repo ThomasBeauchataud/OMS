@@ -6,13 +6,21 @@ framework:
         transports:
             order:
                 dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
-                serializer: App\Messenger\OrderSerializer
+                serializer: App\Messenger\Order\ImportOrderMessageSerializer
                 options:
                     queues:
                         order:
                             binding_keys: []
+            deliveryNote:
+                dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
+                serializer: App\Messenger\DeliveryNote\ImportDeliveryNoteMessageSerializer
+                options:
+                    queues:
+                        order:
+                            binding_keys: [ ]
 
         routing:
             # Route your messages to the transports
             # 'App\Message\YourMessage': async
-            App\Messenger\OrderMessage: order
+            App\Messenger\Order\ImportOrderMessage: order
+            App\Messenger\DeliveryNote\ImportDeliveryNoteMessage: order

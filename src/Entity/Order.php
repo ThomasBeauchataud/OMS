@@ -37,22 +37,22 @@ class Order
      * The id defined to by transmitter of the order, used to communicate with the transmitter about the order
      *
      * @ORM\Column(type="integer")
-     * @Assert\NotNull()
+     * @Assert\NotNull(message="Missing externalId attribute")
      */
     protected int $externalId;
 
     /**
      * The transmitter who sent the order to this OMS
      *
-     * @ORM\ManyToOne(targetEntity=Transmitter::class, fetch="EAGER")
-     * @Assert\NotNull()
+     * @ORM\ManyToOne(targetEntity=Transmitter::class, inversedBy="order", fetch="EAGER")
+     * @Assert\NotNull(message="Missing transmitter attribute")
      */
     protected Transmitter $transmitter;
 
     /**
      * The defined sender of the order, who is defined at the initialisation of the workflow
      *
-     * @ORM\ManyToOne(targetEntity=Sender::class, fetch="EAGER")
+     * @ORM\ManyToOne(targetEntity=Sender::class, inversedBy="order", fetch="EAGER")
      */
     protected ?Sender $sender;
 
@@ -241,28 +241,6 @@ class Order
 
     /*****************************************
      *****************************************
-     **************** METHODS ****************
-     *****************************************
-     *****************************************/
-
-
-    /**
-     * @return bool
-     */
-    public function containsMedicine(): bool
-    {
-        /** @var OrderRow $orderRow */
-        foreach ($this->orderRows as $orderRow) {
-            if ($orderRow->isMedicine()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-
-    /*****************************************
-     *****************************************
      ********** WORKFLOW ACCESSORS ***********
      *****************************************
      *****************************************/
@@ -309,6 +287,28 @@ class Order
     public function getLastUpdate(): DateTimeInterface
     {
         return $this->lastUpdate;
+    }
+
+
+    /*****************************************
+     *****************************************
+     **************** METHODS ****************
+     *****************************************
+     *****************************************/
+
+
+    /**
+     * @return bool
+     */
+    public function containsMedicine(): bool
+    {
+        /** @var OrderRow $orderRow */
+        foreach ($this->orderRows as $orderRow) {
+            if ($orderRow->isMedicine()) {
+                return true;
+            }
+        }
+        return false;
     }
 
 

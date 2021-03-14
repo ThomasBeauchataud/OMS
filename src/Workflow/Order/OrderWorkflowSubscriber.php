@@ -93,7 +93,7 @@ class OrderWorkflowSubscriber implements EventSubscriberInterface
     }
 
     /**
-     *  Check if the order needs some preparation, if it does, create preparation threw the PreparationFactory
+     * Create preparation if needed, else orderRows have null preparation and order will pass to ready state
      *
      * @param Event $event
      */
@@ -101,9 +101,7 @@ class OrderWorkflowSubscriber implements EventSubscriberInterface
     {
         /** @var Order $order */
         $order = $event->getSubject();
-        if (!$this->workflowService->hasSenderStockForOrder($order)) {
-            $this->preparationFactory->createFromWorkflowOrder($order);
-        }
+        $this->workflowService->createNeededPreparation($order);
     }
 
     /**

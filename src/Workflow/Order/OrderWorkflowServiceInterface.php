@@ -34,11 +34,10 @@ interface OrderWorkflowServiceInterface
     public function selectSenderForOrder(Order $order): Sender;
 
     /**
-     * Returns true if the sender has all the stock required to deliver the passed order
+     * Create needed preparation for an order
      *
      * @param Order $order
-     * @return bool
      */
-    public function hasSenderStockForOrder(Order $order): bool;
+    public function createNeededPreparation(Order $order): void;
 
 }

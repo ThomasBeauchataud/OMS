@@ -9,7 +9,8 @@
 namespace App\Workflow\Preparation;
 
 
-use App\Entity\WorkflowPreparation;
+use App\Entity\Order;
+use App\Entity\Preparation;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Workflow\Event\Event;
@@ -24,9 +25,9 @@ class PreparationWorkflowSubscriber implements EventSubscriberInterface
     protected EntityManagerInterface $em;
 
     /**
-     * @var PreparationExporterInterface
+     * @var PreparationWorkflowServiceInterface
      */
-    protected PreparationExporterInterface $preparationExporter;
+    protected PreparationWorkflowServiceInterface $preparationExporter;
 
     /**
      * @var WorkflowInterface
@@ -36,11 +37,11 @@ class PreparationWorkflowSubscriber implements EventSubscriberInterface
     /**
      * OrderWorkflowSubscriber constructor.
      * @param EntityManagerInterface $em
-     * @param PreparationExporterInterface $preparationExporter
+     * @param PreparationWorkflowServiceInterface $preparationExporter
      * @param WorkflowInterface $preparationWorkflow
      */
     public function __construct(EntityManagerInterface $em,
-                                PreparationExporterInterface $preparationExporter,
+                                PreparationWorkflowServiceInterface $preparationExporter,
                                 WorkflowInterface $preparationWorkflow
     )
     {
@@ -69,8 +70,9 @@ class PreparationWorkflowSubscriber implements EventSubscriberInterface
      */
     public function onExported(Event $event): void
     {
-        $this->saveEvent($event);
-        $this->continueWorkflow($event);
+        /** @var Preparation $preparation */
+        $preparation = $event->getSubject();
+        $this->em->getRepository(Preparation::class)->updateState($preparation);
     }
 
     /**
@@ -81,9 +83,9 @@ class PreparationWorkflowSubscriber implements EventSubscriberInterface
      */
     public function onSent(Event $event): void
     {
-        $this->saveEvent($event);
-        $this->continueWorkflow($event);
-
+        /** @var Preparation $preparation */
+        $preparation = $event->getSubject();
+        $this->em->getRepository(Preparation::class)->updateState($preparation);
     }
 
     /**
@@ -91,35 +93,36 @@ class PreparationWorkflowSubscriber implements EventSubscriberInterface
      *
      * @param Event $event
      */
-    public function onDelivered(Event $event): void
+    public function onReceived(Event $event): void
     {
-        $this->saveEvent($event);
+        /** @var Preparation $preparation */
+        $preparation = $event->getSubject();
+        $this->em->getRepository(Preparation::class)->updateState($preparation);
     }
 
     /**
+     * Set the preparation as closed and save it
+     *
      * @param Event $event
-     * @return bool
      */
-    protected function continueWorkflow(Event $event): bool
+    public function close(Event $event): void
     {
-        $workflowPreparation = $event->getSubject();
-        $transitions = $this->workflow->getEnabledTransitions($workflowPreparation);
-        foreach ($transitions as $transition) {
-            if ($this->workflow->can($workflowPreparation, $transition->getName())) {
-                $this->workflow->apply($workflowPreparation, $transition->getName());
-                return true;
-            }
-        }
-        return false;
+        /** @var Preparation $preparation */
+        $preparation = $event->getSubject();
+        $preparation->setClosed(true);
+        $this->em->getRepository(Preparation::class)->updateClosed($preparation);
     }
 
     /**
+     * Saved the preparation state
+     *
      * @param Event $event
      */
-    protected function saveEvent(Event $event)
+    public function onClosed(Event $event): void
     {
-        $this->em->persist($event->getSubject());
-        $this->em->flush();
+        /** @var Preparation $preparation */
+        $preparation = $event->getSubject();
+        $this->em->getRepository(Preparation::class)->updateState($preparation);
     }
 
     /**

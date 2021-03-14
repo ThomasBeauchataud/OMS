@@ -15,6 +15,7 @@ use App\Entity\OrderRow;
 use App\Entity\Sender;
 use App\Entity\Stock;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -55,16 +56,14 @@ class StockRepository extends ServiceEntityRepository
      * @param Order $order
      * @return Stock[]
      */
-    public function findBySenderEntityProduct(Order $order): array
+    public function findBySenderEntityProducts(Order $order): array
     {
         $products = array_map(function (OrderRow $orderRow) {
             return $orderRow->getProduct();
         }, iterator_to_array($order->getOrderRows()));
         $responses = $this->createQueryBuilder('st')
-            ->leftJoin('st.sender', 'se')
-            ->leftJoin('st.entity', 'e')
-            ->where('e = :entity')
-            ->andWhere('se = :sender')
+            ->where('st.entity = :entity')
+            ->andWhere('st.sender = :sender')
             ->andWhere('st.product IN (:products)')
             ->setParameter('sender', $order->getSender())
             ->setParameter('entity', $order->getTransmitter()->getEntity())
@@ -76,6 +75,25 @@ class StockRepository extends ServiceEntityRepository
             $output[$response->getProduct()] = $response;
         }
         return $output;
+    }
+
+    /**
+     * @param OrderRow $orderRow
+     * @param Sender|null $sender
+     * @return Stock|null
+     * @throws NonUniqueResultException
+     */
+    public function findBySenderEntityProduct(OrderRow  $orderRow, Sender $sender = null): ?Stock
+    {
+        return $this->createQueryBuilder('st')
+            ->where('st.entity = :entity')
+            ->andWhere('st.sender = :sender')
+            ->andWhere('st.product = :product')
+            ->setParameter('sender', $sender === null ? $orderRow->getOrder()->getSender() : $sender)
+            ->setParameter('entity', $orderRow->getOrder()->getTransmitter()->getEntity())
+            ->setParameter('product', $orderRow->getProduct())
+            ->getQuery()
+            ->getOneOrNullResult();
     }
 
 }

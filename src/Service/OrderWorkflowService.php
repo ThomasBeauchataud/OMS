@@ -11,8 +11,8 @@ namespace App\Service;
 
 use App\Entity\OrderRow;
 use App\Entity\Order;
+use App\Entity\Preparation;
 use App\Entity\Sender;
-use App\Entity\Stock;
 use App\Entity\TransmitterSender;
 use App\Workflow\Order\OrderWorkflowServiceInterface;
 use Doctrine\ORM\EntityManagerInterface;
@@ -32,14 +32,21 @@ class OrderWorkflowService implements OrderWorkflowServiceInterface
     protected EntityManagerInterface $em;
 
     /**
-     * OrderExporter constructor.
+     * @var PreparationFactory
+     */
+    protected PreparationFactory $preparationFactory;
+
+    /**
+     * OrderWorkflowService constructor.
      * @param ParameterBagInterface $parameterBag
      * @param EntityManagerInterface $em
+     * @param PreparationFactory $preparationFactory
      */
-    public function __construct(ParameterBagInterface $parameterBag, EntityManagerInterface $em)
+    public function __construct(ParameterBagInterface $parameterBag, EntityManagerInterface $em, PreparationFactory $preparationFactory)
     {
         $this->parameterBag = $parameterBag;
         $this->em = $em;
+        $this->preparationFactory = $preparationFactory;
     }
 
 
@@ -98,17 +105,11 @@ class OrderWorkflowService implements OrderWorkflowServiceInterface
     /**
      * @inheritDoc
      */
-    public function hasSenderStockForOrder(Order $order): bool
+    public function createNeededPreparation(Order $order): void
     {
-        $stocks = $this->em->getRepository(Stock::class)->findBySenderEntityProduct($order);
-        foreach($order->getOrderRows() as $orderRow) {
-
-            $senderStock = array_key_exists($orderRow->getProduct(), $stocks) ? $stocks[$orderRow->getProduct()]->getQuantity() : 0;
-            if ($senderStock < $orderRow->getQuantity()) {
-                return false;
-            }
+        $preparations = $this->preparationFactory->create($order);
+        if (count($preparations) > 0) {
+            $this->em->getRepository(Preparation::class)->insertMultiple($preparations);
         }
-        return true;
     }
-
 }

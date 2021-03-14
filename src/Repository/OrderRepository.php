@@ -77,7 +77,7 @@ class OrderRepository extends ServiceEntityRepository
             ->where('o.id = :id')
             ->setParameter('state', json_encode($order->getState()))
             ->setParameter('update', $order->getLastUpdate()->format('Y-m-d h:i:s'))
-            ->setParameter('incomplete', $order->isForcedIncomplete())
+            ->setParameter('incomplete', $order->forceReadyState())
             ->setParameter('id', $order->getId())
             ->getQuery()
             ->execute();

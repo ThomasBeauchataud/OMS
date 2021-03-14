@@ -43,23 +43,29 @@ class PreparationFactory
 
     /**
      * @param Order $order
-     * @return bool
+     * @return Preparation[]
      */
-    public function createFromWorkflowOrder(Order $order): bool
+    public function create(Order $order): array
     {
-        $output = false;
         $sender = $order->getSender();
         $pickers = $sender->getPickers();
+        $preparations = array();
         /** @var Stock[] $stocks */
-        $stocks = $this->em->getRepository(Stock::class)->findBySenderEntityProduct($order);
+        $stocks = $this->em->getRepository(Stock::class)->findBySenderEntityProducts($order);
         /** @var OrderRow $orderRow */
         foreach ($order->getOrderRows() as $orderRow) {
-            $senderStock = array_key_exists($orderRow->getProduct(), $stocks) ? $stocks[$orderRow->getProduct()]->getQuantity() : 0;
+            $senderStock = array_key_exists($orderRow->getProduct(), $stocks) ? $stocks[$orderRow->getProduct()]->getRealQuantity() : 0;
             if ($senderStock < $orderRow->getQuantity()) {
                 $remainder = $orderRow->getQuantity() - $senderStock;
+                if ($remainder === 0) {
+                    continue;
+                }
                 /** @var Picker $picker */
                 foreach ($pickers as $picker) {
-                    $pickerStock = $this->getSenderStock($picker->getPreparer(), $orderRow, $order);
+                    $pickerStock = $this->getSenderStock($picker->getPreparer(), $orderRow);
+                    if ($pickerStock === 0) {
+                        continue;
+                    }
                     if ($pickerStock > $remainder) {
                         $preparationQuantity = $remainder;
                     } else {
@@ -71,33 +77,24 @@ class PreparationFactory
                     $preparation->setProduct($orderRow->getProduct());
                     $preparation->setQuantity($preparationQuantity);
                     $orderRow->setPreparation($preparation);
-                    $this->em->persist($preparation);
-                    $output = true;
+                    $preparations[] = $preparation;
                 }
             }
         }
-        if ($output) {
-            $this->em->flush();
-        }
-        return $output;
+        return $preparations;
 
     }
 
     /**
      * @param Sender $sender
      * @param OrderRow $orderRow
-     * @param Order $order
-     * @return bool
+     * @return int
      */
-    public function getSenderStock(Sender $sender, OrderRow $orderRow, Order $order): bool
+    public function getSenderStock(Sender $sender, OrderRow $orderRow): int
     {
         /** @var Stock $stock */
-        $stock = $this->em->getRepository(Stock::class)->findOneBy(array(
-            'product' => $orderRow->getProduct(),
-            'sender' => $sender,
-            'entity' => $order->getTransmitter()->getEntity()
-        ));
-        return $stock === null ? 0 : $stock->getQuantity();
+        $stock = $this->em->getRepository(Stock::class)->findBySenderEntityProduct($orderRow, $sender);
+        return $stock === null ? 0 : $stock->getRealQuantity();
     }
 
 }

@@ -33,7 +33,14 @@ class Stock
     /**
      * @ORM\Column(type="integer")
      */
-    private string $quantity;
+    private int $quantity;
+
+    /**
+     * The quantity after removing waiting orders and preparations
+     *
+     * @ORM\Column(type="integer")
+     */
+    private int $realQuantity;
 
     /**
      * @ORM\ManyToOne(targetEntity=Entity::class)
@@ -70,9 +77,9 @@ class Stock
     }
 
     /**
-     * @return string
+     * @return int
      */
-    public function getQuantity(): string
+    public function getQuantity(): int
     {
         return $this->quantity;
     }
@@ -83,6 +90,22 @@ class Stock
     public function setQuantity(string $quantity): void
     {
         $this->quantity = $quantity;
+    }
+
+    /**
+     * @return string
+     */
+    public function getRealQuantity(): string
+    {
+        return $this->realQuantity;
+    }
+
+    /**
+     * @param int $realQuantity
+     */
+    public function setRealQuantity(int $realQuantity): void
+    {
+        $this->realQuantity = $realQuantity;
     }
 
     /**

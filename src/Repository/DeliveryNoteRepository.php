@@ -5,7 +5,9 @@
  * From 14/03/2021
  */
 
+
 namespace App\Repository;
+
 
 use App\Entity\DeliveryNote;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -19,37 +21,14 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class DeliveryNoteRepository extends ServiceEntityRepository
 {
+
+    /**
+     * DeliveryNoteRepository constructor.
+     * @param ManagerRegistry $registry
+     */
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, DeliveryNote::class);
     }
 
-    // /**
-    //  * @return DeliveryNote[] Returns an array of DeliveryNote objects
-    //  */
-    /*
-    public function findByExampleField($value)
-    {
-        return $this->createQueryBuilder('d')
-            ->andWhere('d.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('d.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
-    }
-    */
-
-    /*
-    public function findOneBySomeField($value): ?DeliveryNote
-    {
-        return $this->createQueryBuilder('d')
-            ->andWhere('d.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
-    }
-    */
 }

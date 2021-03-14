@@ -31,7 +31,7 @@ class Picker
     private Sender $client;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Sender::class)
+     * @ORM\ManyToOne(targetEntity=Sender::class, inversedBy="client")
      */
     private Sender $preparer;
 
