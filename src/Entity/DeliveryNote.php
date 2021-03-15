@@ -2,14 +2,13 @@
 
 /**
  * Author Thomas Beauchataud
- * From 14/03/2021
+ * Since 14/03/2021
  */
 
 
 namespace App\Entity;
 
 
-use App\Entity\Order;
 use App\Repository\DeliveryNoteRepository;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -27,7 +26,7 @@ class DeliveryNote
     private int $id;
 
     /**
-     * @var \App\Entity\Order
+     * @var Order
      */
     private Order $order;
 

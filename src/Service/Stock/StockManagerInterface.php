@@ -2,7 +2,7 @@
 
 /**
  * Author Thomas Beauchataud
- * From 14/03/2021
+ * Since 14/03/2021
  */
 
 
@@ -24,5 +24,13 @@ interface StockManagerInterface
      * @param Entity $entity
      */
     public function importStocks(array $stocks, Sender $sender, Entity  $entity): void;
+
+    /**
+     * @param Entity $entity
+     * @param Sender $sender
+     * @param array $products
+     * @return mixed
+     */
+    public function updateRealStocks(Entity $entity, Sender $sender, array $products);
 
 }

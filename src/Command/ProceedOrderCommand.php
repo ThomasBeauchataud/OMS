@@ -2,7 +2,7 @@
 
 /**
  * Author Thomas Beauchataud
- * From 14/03/2021
+ * Since 14/03/2021
  */
 
 
@@ -10,7 +10,7 @@ namespace App\Command;
 
 
 use App\Entity\Order;
-use App\Workflow\RunnerWorkflow;
+use App\Workflow\WorkflowRunner;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -30,16 +30,16 @@ class ProceedOrderCommand extends Command
     protected EntityManagerInterface $em;
 
     /**
-     * @var RunnerWorkflow
+     * @var WorkflowRunner
      */
-    protected RunnerWorkflow $workflow;
+    protected WorkflowRunner $workflow;
 
     /**
      * OrderLoaderCommand constructor.
      * @param EntityManagerInterface $em
-     * @param RunnerWorkflow $orderWorkflow
+     * @param WorkflowRunner $orderWorkflow
      */
-    public function __construct(EntityManagerInterface $em, RunnerWorkflow $orderWorkflow)
+    public function __construct(EntityManagerInterface $em, WorkflowRunner $orderWorkflow)
     {
         parent::__construct();
         $this->em = $em;
@@ -52,6 +52,7 @@ class ProceedOrderCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+
         $orders = $this->em->getRepository(Order::class)->findBy(['closed' => false]);
         $total = count($orders);
         $output->writeln("Running workflow on $total commands.");

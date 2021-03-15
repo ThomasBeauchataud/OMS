@@ -2,7 +2,7 @@
 
 /**
  * Author Thomas Beauchataud
- * From 14/03/2021
+ * Since 14/03/2021
  */
 
 
@@ -44,20 +44,22 @@ class Order
     /**
      * The transmitter who sent the order to this OMS
      *
-     * @ORM\ManyToOne(targetEntity=Transmitter::class, inversedBy="order", fetch="EAGER")
+     * @ORM\ManyToOne(targetEntity=Transmitter::class, inversedBy="orders", fetch="EAGER")
      * @Assert\NotNull(message="Missing transmitter attribute")
      */
     protected Transmitter $transmitter;
 
     /**
      * The defined sender of the order, who is defined at the initialisation of the workflow
+     * It can also be defined by the transmitter at the creation of the order
      *
-     * @ORM\ManyToOne(targetEntity=Sender::class, inversedBy="order", fetch="EAGER")
+     * @ORM\ManyToOne(targetEntity=Sender::class, inversedBy="orders", fetch="EAGER")
      */
     protected ?Sender $sender;
 
     /**
      * The delivery note received from the sender of the order when the order is delivered
+     * While this value is null, it blocks the workflow to the delivered state
      *
      * @ORM\OneToOne(targetEntity=DeliveryNote::class, fetch="EAGER", cascade={"persist", "remove"})
      */

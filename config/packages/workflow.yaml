@@ -65,6 +65,7 @@ framework:
                 - exported # The preparation has been exported to a picker
                 - sent # The preparation has been done by the picker
                 - received # The preparation has been received by the sender
+                - closed #
             # Workflow transitions from a state to an other
             transitions:
                 to_exported:
@@ -76,3 +77,6 @@ framework:
                 to_received:
                     from: sent
                     to: received
+                to_closed:
+                    from: received
+                    to: closed

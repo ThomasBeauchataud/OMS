@@ -2,14 +2,14 @@
 
 /**
  * Author Thomas Beauchataud
- * From 14/03/2021
+ * Since 14/03/2021
  */
 
 
 namespace App\Messenger\DeliveryNote;
 
 
-use App\Workflow\RunnerWorkflow;
+use App\Workflow\WorkflowRunner;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
@@ -27,9 +27,9 @@ class ImportDeliveryNoteMessageHandler implements MessageHandlerInterface
     protected EntityManagerInterface $em;
 
     /**
-     * @var RunnerWorkflow
+     * @var WorkflowRunner
      */
-    protected RunnerWorkflow $workflow;
+    protected WorkflowRunner $workflow;
 
     /**
      * @var ValidatorInterface
@@ -39,10 +39,10 @@ class ImportDeliveryNoteMessageHandler implements MessageHandlerInterface
     /**
      * OrderMessageHandler constructor.
      * @param EntityManagerInterface $em
-     * @param RunnerWorkflow $workflow
+     * @param WorkflowRunner $workflow
      * @param ValidatorInterface $validator
      */
-    public function __construct(EntityManagerInterface $em, RunnerWorkflow $workflow, ValidatorInterface $validator)
+    public function __construct(EntityManagerInterface $em, WorkflowRunner $workflow, ValidatorInterface $validator)
     {
         $this->em = $em;
         $this->workflow = $workflow;

@@ -2,7 +2,7 @@
 
 /**
  * Author Thomas Beauchataud
- * From 14/03/2021
+ * Since 14/03/2021
  */
 
 
@@ -12,7 +12,6 @@ namespace App\Repository;
 use App\Entity\Preparation;
 use App\Entity\Stock;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\DBAL\Driver\Exception;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -85,27 +84,6 @@ class PreparationRepository extends ServiceEntityRepository
             ->setParameter('id', $preparation->getId())
             ->getQuery()
             ->execute();
-    }
-
-    /**
-     * @param Preparation[] $preparations
-     * @throws Exception
-     * @throws \Doctrine\DBAL\Exception
-     */
-    public function insertMultiple(array $preparations): void
-    {
-        $query = "INSERT INTO preparation (picker_id, product, quantity, state, last_update, closed) VALUES ";
-        foreach ($preparations as $preparation) {
-            $values = "(" . $preparation->getPicker()->getId() . ","
-                . "'" . $preparation->getProduct() . "',"
-                . $preparation->getQuantity() . ","
-                . "'" . json_encode($preparation->getState()) . "',"
-                . "'" . $preparation->getLastUpdate()->format('Y-m-d h:i:s') . "',"
-                . ($preparation->isClosed() ? 1 : 0) . "),";
-            $query .= $values;
-        }
-        $query = substr($query, 0, -1);
-        $this->getEntityManager()->getConnection()->prepare($query)->execute();
     }
 
 }

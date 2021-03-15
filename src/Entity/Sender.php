@@ -2,7 +2,7 @@
 
 /**
  * Author Thomas Beauchataud
- * From 14/03/2021
+ * Since 14/03/2021
  */
 
 
@@ -10,6 +10,7 @@ namespace App\Entity;
 
 
 use App\Repository\SenderRepository;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -42,6 +43,11 @@ class Sender
     private bool $medicineManager;
 
     /**
+     * @ORM\OneToMany(targetEntity=Order::class, mappedBy="sender", fetch="EAGER")
+     */
+    private Collection $orders;
+
+    /**
      * @ORM\OneToMany(targetEntity=Picker::class, mappedBy="client", fetch="EAGER")
      */
     private Collection $pickers;
@@ -50,6 +56,17 @@ class Sender
      * @ORM\OneToMany(targetEntity=Picker::class, mappedBy="preparer", fetch="EAGER")
      */
     private Collection $clients;
+
+    /**
+     * Sender constructor.
+     */
+    public function __construct()
+    {
+        $this->orders = new ArrayCollection();
+        $this->pickers = new ArrayCollection();
+        $this->clients = new ArrayCollection();
+    }
+
 
     /**
      * @return int

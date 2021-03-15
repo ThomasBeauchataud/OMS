@@ -2,7 +2,7 @@
 
 /**
  * Author Thomas Beauchataud
- * From 14/03/2021
+ * Since 14/03/2021
  */
 
 
@@ -15,6 +15,7 @@ use App\Entity\OrderRow;
 use App\Entity\Sender;
 use App\Entity\Stock;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\DBAL\Driver\Exception;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -71,7 +72,7 @@ class StockRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
         $output = array();
-        foreach($responses as $response) {
+        foreach ($responses as $response) {
             $output[$response->getProduct()] = $response;
         }
         return $output;
@@ -83,7 +84,7 @@ class StockRepository extends ServiceEntityRepository
      * @return Stock|null
      * @throws NonUniqueResultException
      */
-    public function findBySenderEntityProduct(OrderRow  $orderRow, Sender $sender = null): ?Stock
+    public function findBySenderEntityProduct(OrderRow $orderRow, Sender $sender = null): ?Stock
     {
         return $this->createQueryBuilder('st')
             ->where('st.entity = :entity')
@@ -94,6 +95,28 @@ class StockRepository extends ServiceEntityRepository
             ->setParameter('product', $orderRow->getProduct())
             ->getQuery()
             ->getOneOrNullResult();
+    }
+
+    /**
+     * @throws Exception
+     * @throws \Doctrine\DBAL\Exception
+     */
+    public function updateRealStock(): void
+    {
+        $this->_em->getConnection()->prepare('CALL update_real_stock ()')->execute();
+    }
+
+    /**
+     * @param Entity $entity
+     * @param Sender $sender
+     * @param array $products
+     * @throws Exception
+     * @throws \Doctrine\DBAL\Exception
+     */
+    public function updateRealStockProduct(Entity $entity, Sender $sender, array $products): void
+    {
+        $query = 'CALL update_real_stock_product (?, ?, ?)';
+        $this->_em->getConnection()->prepare($query)->execute([$entity->getId(), $sender->getId(), implode(',', $products)]);
     }
 
 }

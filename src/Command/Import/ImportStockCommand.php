@@ -2,7 +2,7 @@
 
 /**
  * Author Thomas Beauchataud
- * From 14/03/2021
+ * Since 14/03/2021
  */
 
 
@@ -75,7 +75,9 @@ class ImportStockCommand extends Command
                     if ($entity !== null) {
                         foreach (scandir("$baseFolder/$senderAlias/$entityAlias") as $file) {
                             if ($file === self::FILE_NAME) {
+                                $output->writeln("Creating stocks of $entityAlias from $senderAlias.");
                                 $stocks = $this->createStocks($sender, $entity, "$baseFolder/$senderAlias/$entityAlias/$file");
+                                $output->writeln("Importing stocks of $entityAlias from $senderAlias.");
                                 $this->stockManager->importStocks($stocks, $sender, $entity);
                             }
                         }
@@ -83,6 +85,8 @@ class ImportStockCommand extends Command
                 }
             }
         }
+        $output->writeln("Updating real stocks.");
+        $this->em->getRepository(Stock::class)->updateRealStock();
         return self::SUCCESS;
     }
 

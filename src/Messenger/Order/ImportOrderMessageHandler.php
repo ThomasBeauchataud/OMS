@@ -2,14 +2,15 @@
 
 /**
  * Author Thomas Beauchataud
- * From 14/03/2021
+ * Since 14/03/2021
  */
 
 
 namespace App\Messenger\Order;
 
 
-use App\Workflow\RunnerWorkflow;
+use App\Entity\OrderRow;
+use App\Workflow\WorkflowRunner;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Psr\Log\LoggerInterface;
@@ -28,9 +29,9 @@ class ImportOrderMessageHandler implements MessageHandlerInterface
     protected EntityManagerInterface $em;
 
     /**
-     * @var RunnerWorkflow
+     * @var WorkflowRunner
      */
-    protected RunnerWorkflow $workflow;
+    protected WorkflowRunner $workflow;
 
     /**
      * @var ValidatorInterface
@@ -45,12 +46,12 @@ class ImportOrderMessageHandler implements MessageHandlerInterface
     /**
      * ImportOrderMessageHandler constructor.
      * @param EntityManagerInterface $em
-     * @param RunnerWorkflow $workflow
+     * @param WorkflowRunner $workflow
      * @param ValidatorInterface $validator
      * @param LoggerInterface $logger
      */
     public function __construct(EntityManagerInterface $em,
-                                RunnerWorkflow $workflow,
+                                WorkflowRunner $workflow,
                                 ValidatorInterface $validator,
                                 LoggerInterface $logger
     )
@@ -76,6 +77,13 @@ class ImportOrderMessageHandler implements MessageHandlerInterface
             $this->em->persist($order);
             $this->em->flush();
             $this->workflow->proceedOrder($order);
+            /** @var OrderRow $orderRow */
+            foreach($order->getOrderRows() as $orderRow) {
+                $preparation = $orderRow->getPreparation();
+                if($preparation !== null) {
+                    $this->workflow->proceedPreparation($preparation);
+                }
+            }
         } catch (Exception $e) {
             $this->logger->alert("Unable to import the order from"); //TODO ADD ORDER CONTEXT
         }

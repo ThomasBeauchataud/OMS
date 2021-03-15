@@ -2,7 +2,7 @@
 
 /**
  * Author Thomas Beauchataud
- * From 14/03/2021
+ * Since 14/03/2021
  */
 
 
@@ -11,9 +11,9 @@ namespace App\Service;
 
 use App\Entity\OrderRow;
 use App\Entity\Order;
-use App\Entity\Preparation;
 use App\Entity\Sender;
 use App\Entity\TransmitterSender;
+use App\Service\Stock\StockManagerInterface;
 use App\Workflow\Order\OrderWorkflowServiceInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -37,16 +37,27 @@ class OrderWorkflowService implements OrderWorkflowServiceInterface
     protected PreparationFactory $preparationFactory;
 
     /**
+     * @var StockManagerInterface
+     */
+    protected StockManagerInterface $stockManager;
+
+    /**
      * OrderWorkflowService constructor.
      * @param ParameterBagInterface $parameterBag
      * @param EntityManagerInterface $em
      * @param PreparationFactory $preparationFactory
+     * @param StockManagerInterface $stockManager
      */
-    public function __construct(ParameterBagInterface $parameterBag, EntityManagerInterface $em, PreparationFactory $preparationFactory)
+    public function __construct(ParameterBagInterface $parameterBag,
+                                EntityManagerInterface $em,
+                                PreparationFactory $preparationFactory,
+                                StockManagerInterface $stockManager
+    )
     {
         $this->parameterBag = $parameterBag;
         $this->em = $em;
         $this->preparationFactory = $preparationFactory;
+        $this->stockManager = $stockManager;
     }
 
 
@@ -56,16 +67,11 @@ class OrderWorkflowService implements OrderWorkflowServiceInterface
     public function exportToSender(Order $order): void
     {
         $directoryPath = $this->parameterBag->get('export.order.folder') . "\\" . $order->getSender()->getAlias();
-        if (!file_exists($directoryPath)) {
-            mkdir($directoryPath, 777, true);
-        }
-        $filePath = $directoryPath . "\\" . $this->parameterBag->get('export.order.sender.file');
-        $file = fopen($filePath, 'w');
-        /** @var OrderRow $orderRow */
-        foreach($order->getOrderRows() as $orderRow) {
-            fwrite($file, $orderRow->getSerialization());
-        }
-        fclose($file);
+        $fileName = $this->parameterBag->get('export.order.sender.file');
+        $content = array_map(function (OrderRow $orderRow) {
+            return $orderRow->getSerialization();
+        }, iterator_to_array($order->getOrderRows()));
+        FileWriter::writeFile($directoryPath, $fileName, $content);
     }
 
     /**
@@ -73,13 +79,12 @@ class OrderWorkflowService implements OrderWorkflowServiceInterface
      */
     public function exportToTransmitter(Order $order): void
     {
-        $filePath = $this->parameterBag->get('export.order.folder') . "\\" . $order->getTransmitter()->getAlias() . $this->parameterBag->get('export.order.transmitter.file');
-        $file = fopen($filePath, 'w');
-        /** @var OrderRow $orderRow */
-        foreach($order->getOrderRows() as $orderRow) {
-            fwrite($file, $orderRow->getSerialization());
-        }
-        fclose($file);
+        $directoryPath = $this->parameterBag->get('export.order.folder') . "\\" . $order->getTransmitter()->getAlias();
+        $fileName = $this->parameterBag->get('export.order.transmitter.file');
+        $content = array_map(function (OrderRow $orderRow) {
+            return $orderRow->getSerialization();
+        }, iterator_to_array($order->getOrderRows()));
+        FileWriter::writeFile($directoryPath, $fileName, $content);
     }
 
     /**
@@ -109,7 +114,26 @@ class OrderWorkflowService implements OrderWorkflowServiceInterface
     {
         $preparations = $this->preparationFactory->create($order);
         if (count($preparations) > 0) {
-            $this->em->getRepository(Preparation::class)->insertMultiple($preparations);
+            foreach($preparations as $preparation) {
+                $orderRow = $preparation->getOrderRow();
+                $orderRow->setPreparation($preparation);
+                $this->em->persist($orderRow);
+            }
+            $this->em->flush();
         }
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function updateRealStock(Order $order): void
+    {
+        $this->stockManager->updateRealStocks(
+            $order->getTransmitter()->getEntity(),
+            $order->getSender(),
+            array_map(function (OrderRow $orderRow) {
+                return $orderRow->getProduct();
+            }, iterator_to_array($order->getOrderRows()))
+        );
     }
 }

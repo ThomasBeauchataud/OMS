@@ -2,14 +2,13 @@
 
 /**
  * Author Thomas Beauchataud
- * From 14/03/2021
+ * Since 14/03/2021
  */
 
 
 namespace App\Workflow\Preparation;
 
 
-use App\Entity\Order;
 use App\Entity\Preparation;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -27,7 +26,7 @@ class PreparationWorkflowSubscriber implements EventSubscriberInterface
     /**
      * @var PreparationWorkflowServiceInterface
      */
-    protected PreparationWorkflowServiceInterface $preparationExporter;
+    protected PreparationWorkflowServiceInterface $workflowService;
 
     /**
      * @var WorkflowInterface
@@ -37,16 +36,16 @@ class PreparationWorkflowSubscriber implements EventSubscriberInterface
     /**
      * OrderWorkflowSubscriber constructor.
      * @param EntityManagerInterface $em
-     * @param PreparationWorkflowServiceInterface $preparationExporter
+     * @param PreparationWorkflowServiceInterface $workflowService
      * @param WorkflowInterface $preparationWorkflow
      */
     public function __construct(EntityManagerInterface $em,
-                                PreparationWorkflowServiceInterface $preparationExporter,
+                                PreparationWorkflowServiceInterface $workflowService,
                                 WorkflowInterface $preparationWorkflow
     )
     {
         $this->em = $em;
-        $this->preparationExporter = $preparationExporter;
+        $this->workflowService = $workflowService;
         $this->workflow = $preparationWorkflow;
     }
 
@@ -57,9 +56,10 @@ class PreparationWorkflowSubscriber implements EventSubscriberInterface
      */
     public function export(Event $event): void
     {
-        /** @var WorkflowPreparation $workflowPreparation */
-        $workflowPreparation = $event->getSubject();
-        //TODO EXPORT WORKFLOW
+        /** @var Preparation $preparation */
+        $preparation = $event->getSubject();
+        $this->workflowService->exportToPicker($preparation);
+        $this->workflowService->updateRealStock($preparation);
     }
 
     /**
@@ -134,7 +134,9 @@ class PreparationWorkflowSubscriber implements EventSubscriberInterface
             'workflow.preparation.enter.exported' => 'export',
             'workflow.preparation.entered.exported' => 'onExported',
             'workflow.preparation.entered.sent' => 'onSent',
-            'workflow.preparation.enter.received' => 'onReceived',
+            'workflow.preparation.entered.received' => 'onReceived',
+            'workflow.preparation.enter.closed' => 'close',
+            'workflow.preparation.entered.closed' => 'onClosed',
         );
     }
 

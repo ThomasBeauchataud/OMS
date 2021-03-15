@@ -2,7 +2,7 @@
 
 /**
  * Author Thomas Beauchataud
- * From 14/03/2021
+ * Since 14/03/2021
  */
 
 
@@ -10,7 +10,7 @@ namespace App\Command;
 
 
 use App\Entity\Preparation;
-use App\Workflow\RunnerWorkflow;
+use App\Workflow\WorkflowRunner;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -30,16 +30,16 @@ class ProceedPreparationCommand extends Command
     protected EntityManagerInterface $em;
 
     /**
-     * @var RunnerWorkflow
+     * @var WorkflowRunner
      */
-    protected RunnerWorkflow $workflow;
+    protected WorkflowRunner $workflow;
 
     /**
      * OrderLoaderCommand constructor.
      * @param EntityManagerInterface $em
-     * @param RunnerWorkflow $preparationWorkflow
+     * @param WorkflowRunner $preparationWorkflow
      */
-    public function __construct(EntityManagerInterface $em, RunnerWorkflow $preparationWorkflow)
+    public function __construct(EntityManagerInterface $em, WorkflowRunner $preparationWorkflow)
     {
         parent::__construct();
         $this->em = $em;
@@ -54,7 +54,7 @@ class ProceedPreparationCommand extends Command
     {
         $preparations = $this->em->getRepository(Preparation::class)->findBy(['closed' => false]);
         $total = count($preparations);
-        $output->writeln("Running workflow on $total commands.");
+        $output->writeln("Running workflow on $total preparations.");
         $count = 0;
         /** @var Preparation $preparation */
         foreach($preparations as $preparation) {

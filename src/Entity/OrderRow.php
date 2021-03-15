@@ -2,7 +2,7 @@
 
 /**
  * Author Thomas Beauchataud
- * From 14/03/2021
+ * Since 14/03/2021
  */
 
 
@@ -50,12 +50,12 @@ class OrderRow
     private bool $medicine;
 
     /**
-     * @ORM\OneToOne(targetEntity=Preparation::class, inversedBy="orderRow", fetch="EAGER")
+     * @ORM\OneToOne(targetEntity=Preparation::class, inversedBy="orderRow", fetch="EAGER", cascade={"persist"})
      */
     private ?Preparation $preparation;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Order::class, inversedBy="order")
+     * @ORM\ManyToOne(targetEntity=Order::class, inversedBy="orderRows")
      */
     private Order $order;
 

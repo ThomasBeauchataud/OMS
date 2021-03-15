@@ -2,7 +2,7 @@
 
 /**
  * Author Thomas Beauchataud
- * From 14/03/2021
+ * Since 14/03/2021
  */
 
 
@@ -36,6 +36,11 @@ class Preparation
      * @ORM\Column(type="integer")
      */
     private int $quantity;
+
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private ?int $sentQuantity;
 
     /**
      * @ORM\ManyToOne(targetEntity=Picker::class)
@@ -83,6 +88,7 @@ class Preparation
      */
     public function __construct()
     {
+        $this->sentQuantity = null;
         $this->closed = false;
         $this->state = array();
         $this->lastUpdate = new DateTime();
@@ -134,6 +140,22 @@ class Preparation
     public function setQuantity(int $quantity): void
     {
         $this->quantity = $quantity;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getSentQuantity(): ?int
+    {
+        return $this->sentQuantity;
+    }
+
+    /**
+     * @param int $sentQuantity
+     */
+    public function setSentQuantity(int $sentQuantity): void
+    {
+        $this->sentQuantity = $sentQuantity;
     }
 
     /**

@@ -2,7 +2,7 @@
 
 /**
  * Author Thomas Beauchataud
- * From 14/03/2021
+ * Since 14/03/2021
  */
 
 
@@ -51,6 +51,15 @@ class Stock
      * @ORM\ManyToOne(targetEntity=Sender::class)
      */
     private Sender $sender;
+
+    /**
+     * Stock constructor.
+     */
+    public function __construct()
+    {
+        $this->realQuantity = 0;
+    }
+
 
     /**
      * @return int

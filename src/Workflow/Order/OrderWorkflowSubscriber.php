@@ -2,7 +2,7 @@
 
 /**
  * Author Thomas Beauchataud
- * From 14/03/2021
+ * Since 14/03/2021
  */
 
 
@@ -78,6 +78,7 @@ class OrderWorkflowSubscriber implements EventSubscriberInterface
             $order->setSender($sender);
         }
         $this->em->getRepository(Order::class)->updateSender($order);
+        $this->workflowService->updateRealStock($order);
     }
 
     /**

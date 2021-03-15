@@ -12,6 +12,9 @@ parameters:
     export.order.sender.file: 'orders-to-deliver.csv'
     export.order.transmitter.file: 'orders-delivered.csv'
 
+    export.prep.folder: '%kernel.project_dir%/output/prep'
+    export.prep.file: 'prep-to-send.csv'
+
 services:
     # default configuration for services in *this* file
     _defaults:

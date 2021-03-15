@@ -2,7 +2,7 @@
 
 /**
  * Author Thomas Beauchataud
- * From 14/03/2021
+ * Since 14/03/2021
  */
 
 
@@ -13,7 +13,7 @@ use App\Entity\Order;
 use App\Entity\Preparation;
 use Symfony\Component\Workflow\Registry;
 
-class RunnerWorkflow
+class WorkflowRunner
 {
 
     /**

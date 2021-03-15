@@ -2,7 +2,7 @@
 
 /**
  * Author Thomas Beauchataud
- * From 14/03/2021
+ * Since 14/03/2021
  */
 
 
@@ -43,6 +43,11 @@ class Transmitter
     private Entity $entity;
 
     /**
+     * @ORM\OneToMany(targetEntity=Order::class, mappedBy="transmitter")
+     */
+    private Collection $orders;
+
+    /**
      * @ORM\OneToMany(targetEntity=TransmitterSender::class, mappedBy="transmitter")
      */
     private Collection $transmitterSenders;
@@ -52,6 +57,7 @@ class Transmitter
      */
     public function __construct()
     {
+        $this->orders = new ArrayCollection();
         $this->transmitterSenders = new ArrayCollection();
     }
 
@@ -101,6 +107,14 @@ class Transmitter
     public function getEntity(): Entity
     {
         return $this->entity;
+    }
+
+    /**
+     * @return Collection
+     */
+    public function getOrders(): Collection
+    {
+        return $this->orders;
     }
 
     /**

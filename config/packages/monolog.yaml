@@ -11,10 +11,16 @@ monolog:
             path: "%kernel.logs_dir%/%kernel.environment%/%kernel.environment%.log"
             level: debug
             max_files: 3
-            channels: [ "!doctrine" , "!request" , "!messenger" ]
+            channels: [ "!doctrine" , "!messenger" , "!workflow" ]
         messenger:
             level: debug
             type: rotating_file
             path: '%kernel.logs_dir%/%kernel.environment%/messenger.log'
             max_files: 3
             channels: [ messenger ]
+        workflow:
+            level: debug
+            type: rotating_file
+            path: '%kernel.logs_dir%/%kernel.environment%/workflow.log'
+            max_files: 3
+            channels: [ workflow ]

@@ -2,7 +2,7 @@
 
 /**
  * Author Thomas Beauchataud
- * From 14/03/2021
+ * Since 14/03/2021
  */
 
 
@@ -76,7 +76,7 @@ class PreparationFactory
                     $preparation->setPicker($picker);
                     $preparation->setProduct($orderRow->getProduct());
                     $preparation->setQuantity($preparationQuantity);
-                    $orderRow->setPreparation($preparation);
+                    $preparation->setOrderRow($orderRow);
                     $preparations[] = $preparation;
                 }
             }
@@ -90,7 +90,7 @@ class PreparationFactory
      * @param OrderRow $orderRow
      * @return int
      */
-    public function getSenderStock(Sender $sender, OrderRow $orderRow): int
+    private function getSenderStock(Sender $sender, OrderRow $orderRow): int
     {
         /** @var Stock $stock */
         $stock = $this->em->getRepository(Stock::class)->findBySenderEntityProduct($orderRow, $sender);
