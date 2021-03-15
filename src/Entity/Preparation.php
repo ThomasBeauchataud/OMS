@@ -20,6 +20,13 @@ use Doctrine\ORM\Mapping as ORM;
 class Preparation
 {
 
+    /*****************************************
+     *****************************************
+     ************** ATTRIBUTES ***************
+     *****************************************
+     *****************************************/
+
+
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
@@ -234,9 +241,9 @@ class Preparation
     }
 
     /**
-     * @return DateTime|DateTimeInterface
+     * @return DateTimeInterface
      */
-    public function getLastUpdate()
+    public function getLastUpdate(): DateTimeInterface
     {
         return $this->lastUpdate;
     }

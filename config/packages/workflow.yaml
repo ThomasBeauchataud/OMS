@@ -32,13 +32,13 @@ framework:
                 to_preparation:
                     from: initialized
                     to: preparation
-                to_ready:
+                to_ready: # Transition block when an orderRow has an unfinished preparation
                     from: preparation
                     to: ready
                 to_exported:
                     from: ready
                     to: exported
-                to_delivered:
+                to_delivered: # Transition block when an order doesn't have any delivery note
                     from: exported
                     to: delivered
                 to_closed:

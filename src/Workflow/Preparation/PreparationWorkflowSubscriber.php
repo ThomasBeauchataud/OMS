@@ -15,6 +15,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Workflow\Event\Event;
 use Symfony\Component\Workflow\WorkflowInterface;
 
+/**
+ * TODO Create retrocession state for preparation whose the picker entity is different from the transmitter entity of the order
+ */
 class PreparationWorkflowSubscriber implements EventSubscriberInterface
 {
 

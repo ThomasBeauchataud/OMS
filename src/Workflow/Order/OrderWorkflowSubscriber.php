@@ -10,7 +10,6 @@ namespace App\Workflow\Order;
 
 
 use App\Entity\Order;
-use App\Service\PreparationFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Workflow\Event\Event;
@@ -18,9 +17,6 @@ use Symfony\Component\Workflow\WorkflowInterface;
 
 /**
  * Manage the workflow of an order
- *
- * Class OrderWorkflowSubscriber
- * @package App\Workflow\Order
  */
 class OrderWorkflowSubscriber implements EventSubscriberInterface
 {
@@ -36,11 +32,6 @@ class OrderWorkflowSubscriber implements EventSubscriberInterface
     protected OrderWorkflowServiceInterface $workflowService;
 
     /**
-     * @var PreparationFactory
-     */
-    protected PreparationFactory $preparationFactory;
-
-    /**
      * @var WorkflowInterface
      */
     protected WorkflowInterface $workflow;
@@ -50,18 +41,15 @@ class OrderWorkflowSubscriber implements EventSubscriberInterface
      * @param EntityManagerInterface $em
      * @param OrderWorkflowServiceInterface $workflowService
      * @param WorkflowInterface $orderWorkflow
-     * @param PreparationFactory $preparationCreator
      */
     public function __construct(EntityManagerInterface $em,
                                 OrderWorkflowServiceInterface $workflowService,
-                                WorkflowInterface $orderWorkflow,
-                                PreparationFactory $preparationCreator
+                                WorkflowInterface $orderWorkflow
     )
     {
         $this->em = $em;
         $this->workflowService = $workflowService;
         $this->workflow = $orderWorkflow;
-        $this->preparationFactory = $preparationCreator;
     }
 
     /**

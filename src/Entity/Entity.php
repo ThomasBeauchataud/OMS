@@ -13,10 +13,20 @@ use App\Repository\EntityRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
+ * Financial entity
+ * There can't be two entities having the same billing point
+ *
  * @ORM\Entity(repositoryClass=EntityRepository::class)
  */
 class Entity
 {
+
+    /*****************************************
+     *****************************************
+     ************** ATTRIBUTES ***************
+     *****************************************
+     *****************************************/
+
 
     /**
      * @ORM\Id
@@ -34,6 +44,14 @@ class Entity
      * @ORM\Column(type="string", length=255)
      */
     private string $alias;
+
+
+    /*****************************************
+     *****************************************
+     ********* ATTRIBUTES ACCESSORS **********
+     *****************************************
+     *****************************************/
+
 
     /**
      * @return int

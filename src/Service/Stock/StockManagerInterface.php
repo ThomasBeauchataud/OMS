@@ -26,6 +26,9 @@ interface StockManagerInterface
     public function importStocks(array $stocks, Sender $sender, Entity  $entity): void;
 
     /**
+     * Update the database real stock for the passed products
+     * Call this method just after the creation of a new preparation or the initialization of a new order
+     *
      * @param Entity $entity
      * @param Sender $sender
      * @param array $products

@@ -10,6 +10,7 @@ namespace App\Entity;
 
 
 use App\Repository\OrderRepository;
+use App\Service\Constraint\CustomUniqueEntity;
 use DateTime;
 use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -18,11 +19,21 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
+ * The CustomUniqueEntity annotation prevent a transmitter to overwrite an order already running in the workflow
+ *
  * @ORM\Entity(repositoryClass=OrderRepository::class)
  * @ORM\Table(name="`order`")
+ * @CustomUniqueEntity({"transmitter", "externalId"})
  */
 class Order
 {
+
+    /*****************************************
+     *****************************************
+     ************** ATTRIBUTES ***************
+     *****************************************
+     *****************************************/
+
 
     /**
      * The id of the order defined by the OMS
@@ -61,7 +72,7 @@ class Order
      * The delivery note received from the sender of the order when the order is delivered
      * While this value is null, it blocks the workflow to the delivered state
      *
-     * @ORM\OneToOne(targetEntity=DeliveryNote::class, fetch="EAGER", cascade={"persist", "remove"})
+     * @ORM\OneToOne(targetEntity=DeliveryNote::class, inversedBy="order", fetch="EAGER", cascade={"persist", "remove"})
      */
     protected ?DeliveryNote $deliveryNote;
 

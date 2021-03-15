@@ -13,10 +13,20 @@ use App\Repository\TransmitterSenderRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
+ * The mapping between transmitter and sender
+ * This mapping and his priorities are used the choose the sender of an order during his initialisation
+ *
  * @ORM\Entity(repositoryClass=TransmitterSenderRepository::class)
  */
 class TransmitterSender
 {
+
+    /*****************************************
+     *****************************************
+     ************** ATTRIBUTES ***************
+     *****************************************
+     *****************************************/
+
 
     /**
      * @ORM\Id
@@ -26,6 +36,8 @@ class TransmitterSender
     private int $id;
 
     /**
+     * 1 the highest priority
+     *
      * @ORM\Column(type="integer")
      */
     private int $priority;
@@ -39,6 +51,14 @@ class TransmitterSender
      * @ORM\ManyToOne(targetEntity=Sender::class)
      */
     private Sender $sender;
+
+
+    /*****************************************
+     *****************************************
+     ********* ATTRIBUTES ACCESSORS **********
+     *****************************************
+     *****************************************/
+
 
     /**
      * @return int

@@ -18,12 +18,26 @@ use Doctrine\ORM\Mapping as ORM;
 class Picker
 {
 
+    /*****************************************
+     *****************************************
+     ************** ATTRIBUTES ***************
+     *****************************************
+     *****************************************/
+
+
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      */
     private int $id;
+
+    /**
+     * 1 the highest priority
+     *
+     * @ORM\Column(type="integer")
+     */
+    private int $priority;
 
     /**
      * @ORM\ManyToOne(targetEntity=Sender::class, inversedBy="pickers")
@@ -35,12 +49,36 @@ class Picker
      */
     private Sender $preparer;
 
+
+    /*****************************************
+     *****************************************
+     ********* ATTRIBUTES ACCESSORS **********
+     *****************************************
+     *****************************************/
+
+
     /**
      * @return int
      */
     public function getId(): int
     {
         return $this->id;
+    }
+
+    /**
+     * @return int
+     */
+    public function getPriority(): int
+    {
+        return $this->priority;
+    }
+
+    /**
+     * @param int $priority
+     */
+    public function setPriority(int $priority): void
+    {
+        $this->priority = $priority;
     }
 
     /**

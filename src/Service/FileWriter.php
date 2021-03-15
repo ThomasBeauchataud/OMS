@@ -13,6 +13,9 @@ class FileWriter
 {
 
     /**
+     * Just write in a file
+     * Create folders if they doesn't exist
+     *
      * @param string $directoryPath
      * @param string $fileName
      * @param array $rows

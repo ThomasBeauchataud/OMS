@@ -34,27 +34,6 @@ class PreparationRepository extends ServiceEntityRepository
 
 
     /**
-     * @param Stock $stock
-     * @return int|null
-     */
-    public function findCountQuantityByEntitySenderProduct(Stock $stock): ?int
-    {
-        return $this->createQueryBuilder('p')
-            ->select('sum(p.quantity)')
-            ->leftJoin('p.orderRow', 'odr')
-            ->leftJoin('odr.order', 'o')
-            ->leftJoin('o.transmitter', 't')
-            ->where('t.entity = :entity')
-            ->andWhere('o.sender = :sender')
-            ->andWhere('odr.product = :product')
-            ->setParameter('entity', $stock->getEntity())
-            ->setParameter('sender', $stock->getSender())
-            ->setParameter('product', $stock->getProduct())
-            ->getQuery()
-            ->getFirstResult();
-    }
-
-    /**
      * @param Preparation $preparation
      */
     public function updateState(Preparation $preparation): void

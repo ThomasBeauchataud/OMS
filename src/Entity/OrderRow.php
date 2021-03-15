@@ -14,10 +14,19 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
+ * The mapping between an order and his products
+ *
  * @ORM\Entity(repositoryClass=OrderRowRepository::class)
  */
 class OrderRow
 {
+
+    /*****************************************
+     *****************************************
+     ************** ATTRIBUTES ***************
+     *****************************************
+     *****************************************/
+
 
     /**
      * @ORM\Id
@@ -64,6 +73,14 @@ class OrderRow
      */
     private string $serialization;
 
+
+    /*****************************************
+     *****************************************
+     ************** CONSTRUCTOR **************
+     *****************************************
+     *****************************************/
+
+
     /**
      * OrderRow constructor.
      */
@@ -72,6 +89,13 @@ class OrderRow
         $this->medicine = false;
         $this->preparation = null;
     }
+
+
+    /*****************************************
+     *****************************************
+     ********* ATTRIBUTES ACCESSORS **********
+     *****************************************
+     *****************************************/
 
 
     /**

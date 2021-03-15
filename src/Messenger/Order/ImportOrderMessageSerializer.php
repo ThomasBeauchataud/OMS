@@ -57,7 +57,7 @@ class ImportOrderMessageSerializer implements TransportSerializerInterface
         if ($transmitter !== null) {
             $order->setTransmitter($transmitter);
         }
-        return new Envelope(new ImportOrderMessage($order));
+        return new Envelope(new ImportOrderMessage($order, $encodedEnvelope));
     }
 
     /**

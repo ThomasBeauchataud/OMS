@@ -34,16 +34,4 @@ class OrderRowRepository extends ServiceEntityRepository
         parent::__construct($registry, OrderRow::class);
     }
 
-
-    /**
-     * @param Stock $stock
-     * @return int|null
-     * @throws Exception
-     */
-    public function findCountQuantityByEntitySenderProduct(Stock $stock): ?int
-    {
-        $query = 'SELECT sum(o0_.quantity) FROM order_row o0_ LEFT JOIN `order` o1_ ON o0_.order_id = o1_.id LEFT JOIN transmitter t2_ ON o1_.transmitter_id = t2_.id WHERE t2_.entity_id = ? AND o1_.sender_id = ? AND o0_.product = ? AND o0_.preparation_id IS NULL';
-        return $this->_em->getConnection()->fetchOne($query, array($stock->getEntity()->getId(), $stock->getSender()->getId(), $stock->getProduct()));
-    }
-
 }

@@ -50,7 +50,10 @@ class ImportStockCommand extends Command
      * @param StockManagerInterface $stockManager
      * @param ParameterBagInterface $parameterBag
      */
-    public function __construct(EntityManagerInterface $em, StockManagerInterface $stockManager, ParameterBagInterface $parameterBag)
+    public function __construct(EntityManagerInterface $em,
+                                StockManagerInterface $stockManager,
+                                ParameterBagInterface $parameterBag
+    )
     {
         parent::__construct();
         $this->em = $em;

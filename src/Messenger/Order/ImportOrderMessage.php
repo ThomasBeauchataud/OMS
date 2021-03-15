@@ -23,12 +23,19 @@ class ImportOrderMessage
     protected Order $order;
 
     /**
+     * @var array
+     */
+    protected array $context;
+
+    /**
      * OrderMessage constructor.
      * @param Order $order
+     * @param array $context
      */
-    public function __construct(Order $order)
+    public function __construct(Order $order, array $context = array())
     {
         $this->order = $order;
+        $this->context = $context;
     }
 
 
@@ -38,6 +45,14 @@ class ImportOrderMessage
     public function getOrder(): Order
     {
         return $this->order;
+    }
+
+    /**
+     * @return array
+     */
+    public function getContext(): array
+    {
+        return $this->context;
     }
 
 }

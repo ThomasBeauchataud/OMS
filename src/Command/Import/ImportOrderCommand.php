@@ -12,12 +12,12 @@ namespace App\Command\Import;
 use App\Entity\Transmitter;
 use App\Entity\Order;
 use App\Entity\OrderRow;
+use App\Service\Order\OrderPersistentManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
-use Symfony\Component\Workflow\WorkflowInterface;
 
 class ImportOrderCommand extends Command
 {
@@ -33,9 +33,9 @@ class ImportOrderCommand extends Command
     protected EntityManagerInterface $em;
 
     /**
-     * @var WorkflowInterface
+     * @var OrderPersistentManager
      */
-    protected WorkflowInterface $workflow;
+    protected OrderPersistentManager $orderPersistentManager;
 
     /**
      * @var ParameterBagInterface
@@ -43,16 +43,19 @@ class ImportOrderCommand extends Command
     protected ParameterBagInterface $parameterBag;
 
     /**
-     * OrderLoaderCommand constructor.
+     * ImportOrderCommand constructor.
      * @param EntityManagerInterface $em
-     * @param WorkflowInterface $orderWorkflow
+     * @param OrderPersistentManager $orderPersistentManager
      * @param ParameterBagInterface $parameterBag
      */
-    public function __construct(EntityManagerInterface $em, WorkflowInterface $orderWorkflow, ParameterBagInterface $parameterBag)
+    public function __construct(EntityManagerInterface $em,
+                                OrderPersistentManager $orderPersistentManager,
+                                ParameterBagInterface $parameterBag
+    )
     {
         parent::__construct();
         $this->em = $em;
-        $this->workflow = $orderWorkflow;
+        $this->orderPersistentManager = $orderPersistentManager;
         $this->parameterBag = $parameterBag;
     }
 
@@ -83,6 +86,7 @@ class ImportOrderCommand extends Command
                         $orders[$data[0]][] = $data;
                     }
                     ini_set('auto_detect_line_endings', FALSE);
+                    $finalOrders = array();
                     foreach($orders as $orderId => $o) {
                         $order = new Order();
                         $order->setTransmitter($transmitter);
@@ -95,12 +99,12 @@ class ImportOrderCommand extends Command
                             $orderRow->setSerialization(implode(";", $or));
                             $order->addOrderRow($orderRow);
                         }
-                        $this->em->persist($order);
+                        $finalOrders[] = $order;
                     }
+                    $this->orderPersistentManager->persist($finalOrders);
                 }
             }
         }
-        $this->em->flush();
         return self::SUCCESS;
     }
 
