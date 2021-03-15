@@ -49,6 +49,16 @@ class Picker
      */
     private Sender $preparer;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=Entity::class)
+     */
+    private Entity $clientEntity;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Entity::class)
+     */
+    private Entity $preparerEntity;
+
 
     /*****************************************
      *****************************************
@@ -111,6 +121,38 @@ class Picker
     public function setPreparer(Sender $preparer): void
     {
         $this->preparer = $preparer;
+    }
+
+    /**
+     * @return Entity
+     */
+    public function getClientEntity(): Entity
+    {
+        return $this->clientEntity;
+    }
+
+    /**
+     * @param Entity $clientEntity
+     */
+    public function setClientEntity(Entity $clientEntity): void
+    {
+        $this->clientEntity = $clientEntity;
+    }
+
+    /**
+     * @return Entity
+     */
+    public function getPreparerEntity(): Entity
+    {
+        return $this->preparerEntity;
+    }
+
+    /**
+     * @param Entity $preparerEntity
+     */
+    public function setPreparerEntity(Entity $preparerEntity): void
+    {
+        $this->preparerEntity = $preparerEntity;
     }
     
 }

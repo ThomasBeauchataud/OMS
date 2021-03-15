@@ -28,6 +28,9 @@ use Symfony\Component\Validator\Constraints as Assert;
 class Order
 {
 
+    public const INITIAL_STATE = 'created';
+
+
     /*****************************************
      *****************************************
      ************** ATTRIBUTES ***************
@@ -98,9 +101,9 @@ class Order
     protected bool $closed;
 
     /**
-     * @ORM\Column(type="json")
+     * @ORM\Column(type="string", length=255)
      */
-    protected array $state;
+    protected string $state;
 
     /**
      * @ORM\Column(type="datetime")
@@ -127,7 +130,7 @@ class Order
     {
         $this->closed = false;
         $this->forcedIncomplete = false;
-        $this->state = array();
+        $this->state = self::INITIAL_STATE;
         $this->lastUpdate = new DateTime();
         $this->sender = null;
         $this->deliveryNote = null;
@@ -276,17 +279,17 @@ class Order
     }
 
     /**
-     * @return array
+     * @return string
      */
-    public function getState(): array
+    public function getState(): string
     {
         return $this->state;
     }
 
     /**
-     * @param array $state
+     * @param string $state
      */
-    public function setState(array $state): void
+    public function setState(string $state): void
     {
         if ($this->state !== $state) {
             $this->lastUpdate = new DateTime();

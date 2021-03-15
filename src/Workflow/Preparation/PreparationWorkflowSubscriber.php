@@ -13,7 +13,6 @@ use App\Entity\Preparation;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Workflow\Event\Event;
-use Symfony\Component\Workflow\WorkflowInterface;
 
 /**
  * TODO Create retrocession state for preparation whose the picker entity is different from the transmitter entity of the order
@@ -32,24 +31,16 @@ class PreparationWorkflowSubscriber implements EventSubscriberInterface
     protected PreparationWorkflowServiceInterface $workflowService;
 
     /**
-     * @var WorkflowInterface
-     */
-    protected WorkflowInterface $workflow;
-
-    /**
      * OrderWorkflowSubscriber constructor.
      * @param EntityManagerInterface $em
      * @param PreparationWorkflowServiceInterface $workflowService
-     * @param WorkflowInterface $preparationWorkflow
      */
     public function __construct(EntityManagerInterface $em,
-                                PreparationWorkflowServiceInterface $workflowService,
-                                WorkflowInterface $preparationWorkflow
+                                PreparationWorkflowServiceInterface $workflowService
     )
     {
         $this->em = $em;
         $this->workflowService = $workflowService;
-        $this->workflow = $preparationWorkflow;
     }
 
     /**

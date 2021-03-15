@@ -2,7 +2,7 @@ framework:
     workflows:
         order:
             # Workflow type
-            type: workflow
+            type: state_machine
             # Makes the application generate detailed log messages for the workflow activity
             audit_trail:
                 enabled: true
@@ -46,7 +46,7 @@ framework:
                     to: closed
         preparation:
             # Workflow type
-            type: workflow
+            type: state_machine
             # Makes the application generate detailed log messages for the workflow activity
             audit_trail:
                 enabled: true
@@ -65,7 +65,8 @@ framework:
                 - exported # The preparation has been exported to a picker
                 - sent # The preparation has been done by the picker
                 - received # The preparation has been received by the sender
-                - closed #
+                - retroceeded # The preparation has sent a retrocession order
+                - closed # The preparation is closed
             # Workflow transitions from a state to an other
             transitions:
                 to_exported:
@@ -77,6 +78,9 @@ framework:
                 to_received:
                     from: sent
                     to: received
-                to_closed:
+                to_retroceeded:
                     from: received
+                    to: retroceeded
+                to_closed:
+                    from: [ received , retroceeded ]
                     to: closed

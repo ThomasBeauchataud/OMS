@@ -20,6 +20,9 @@ use Doctrine\ORM\Mapping as ORM;
 class Preparation
 {
 
+    public const INITIAL_STATE = 'created';
+
+
     /*****************************************
      *****************************************
      ************** ATTRIBUTES ***************
@@ -73,9 +76,9 @@ class Preparation
     private bool $closed;
 
     /**
-     * @ORM\Column(type="json")
+     * @ORM\Column(type="string", length=255)
      */
-    private array $state;
+    private string $state;
 
     /**
      * @ORM\Column(type="datetime")
@@ -97,7 +100,7 @@ class Preparation
     {
         $this->sentQuantity = null;
         $this->closed = false;
-        $this->state = array();
+        $this->state = self::INITIAL_STATE;
         $this->lastUpdate = new DateTime();
     }
 
@@ -222,17 +225,17 @@ class Preparation
     }
 
     /**
-     * @return array
+     * @return string
      */
-    public function getState(): array
+    public function getState(): string
     {
         return $this->state;
     }
 
     /**
-     * @param array $state
+     * @param string $state
      */
-    public function setState(array $state): void
+    public function setState(string $state): void
     {
         if ($this->state !== $state) {
             $this->lastUpdate = new DateTime();
@@ -246,6 +249,25 @@ class Preparation
     public function getLastUpdate(): DateTimeInterface
     {
         return $this->lastUpdate;
+    }
+
+
+    /*****************************************
+     *****************************************
+     *********** WORKFLOW METHODS ************
+     *****************************************
+     *****************************************/
+
+
+    /**
+     * Return true if the preparation is a retrocession (if the entity of the client if different from the entity
+     * of the preparer
+     *
+     * @return bool
+     */
+    public function isRetrocession(): bool
+    {
+        return $this->picker->getClientEntity() !== $this->picker->getPreparerEntity();
     }
 
 }

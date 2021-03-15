@@ -13,7 +13,6 @@ use App\Entity\Order;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Workflow\Event\Event;
-use Symfony\Component\Workflow\WorkflowInterface;
 
 /**
  * Manage the workflow of an order
@@ -32,24 +31,16 @@ class OrderWorkflowSubscriber implements EventSubscriberInterface
     protected OrderWorkflowServiceInterface $workflowService;
 
     /**
-     * @var WorkflowInterface
-     */
-    protected WorkflowInterface $workflow;
-
-    /**
      * OrderWorkflowSubscriber constructor.
      * @param EntityManagerInterface $em
      * @param OrderWorkflowServiceInterface $workflowService
-     * @param WorkflowInterface $orderWorkflow
      */
     public function __construct(EntityManagerInterface $em,
-                                OrderWorkflowServiceInterface $workflowService,
-                                WorkflowInterface $orderWorkflow
+                                OrderWorkflowServiceInterface $workflowService
     )
     {
         $this->em = $em;
         $this->workflowService = $workflowService;
-        $this->workflow = $orderWorkflow;
     }
 
     /**

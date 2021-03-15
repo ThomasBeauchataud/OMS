@@ -10,7 +10,6 @@ namespace App\Repository;
 
 
 use App\Entity\Preparation;
-use App\Entity\Stock;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -43,7 +42,7 @@ class PreparationRepository extends ServiceEntityRepository
             ->set('p.state', ':state')
             ->set('p.lastUpdate', ':update')
             ->where('p.id = :id')
-            ->setParameter('state', json_encode($preparation->getState()))
+            ->setParameter('state', $preparation->getState())
             ->setParameter('update', $preparation->getLastUpdate()->format('Y-m-d h:i:s'))
             ->setParameter('id', $preparation->getId())
             ->getQuery()
