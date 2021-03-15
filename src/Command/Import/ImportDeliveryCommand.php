@@ -46,7 +46,7 @@ class ImportDeliveryCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         /** @var Order $order */
-        $order = $this->em->getRepository(Order::class)->findOneBy(['closed' => false, 'deliveryNote' => null]);
+        $order = $this->em->getRepository(Order::class)->findOneBy(['closed' => false, 'deliveryNote' => null, 'state' => 'exported']);
         if ($order === null) {
             return self::SUCCESS;
         }

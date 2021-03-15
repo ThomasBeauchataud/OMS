@@ -53,12 +53,17 @@ class Preparation
     private ?int $sentQuantity;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Picker::class)
+     * @ORM\OneToOne(targetEntity=Retrocession::class, mappedBy="preparation", fetch="EAGER")
+     */
+    private ?Retrocession $retrocession;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Picker::class, fetch="EAGER")
      */
     private Picker $picker;
 
     /**
-     * @ORM\OneToOne(targetEntity=OrderRow::class, mappedBy="preparation", fetch="EAGER")
+     * @ORM\OneToOne(targetEntity=OrderRow::class, inversedBy="preparation", fetch="EAGER")
      */
     private OrderRow $orderRow;
 
@@ -166,6 +171,22 @@ class Preparation
     public function setSentQuantity(int $sentQuantity): void
     {
         $this->sentQuantity = $sentQuantity;
+    }
+
+    /**
+     * @return Retrocession|null
+     */
+    public function getRetrocession(): ?Retrocession
+    {
+        return $this->retrocession;
+    }
+
+    /**
+     * @param Retrocession $retrocession
+     */
+    public function setRetrocession(Retrocession $retrocession): void
+    {
+        $this->retrocession = $retrocession;
     }
 
     /**

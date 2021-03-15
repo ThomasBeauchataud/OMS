@@ -2,7 +2,6 @@
 var
 vendor
 symfony.lock
-.env
 
 ###> symfony/framework-bundle ###
 /.env.local

@@ -43,7 +43,7 @@ class PreparationWorkflowGuardSubscriber implements EventSubscriberInterface
     {
         /** @var Preparation $preparation */
         $preparation = $event->getSubject();
-        if ($preparation->isRetrocession() /** TODO && retrocession is done */) {
+        if ($preparation->isRetrocession() && ($preparation->getRetrocession() === null || !$preparation->getRetrocession()->isSent())) {
             $event->addTransitionBlocker(new TransitionBlocker('Preparation waiting for retrocession', 0));
         }
     }

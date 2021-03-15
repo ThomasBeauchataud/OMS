@@ -50,17 +50,17 @@ class Sender
     private bool $medicineManager;
 
     /**
-     * @ORM\OneToMany(targetEntity=Order::class, mappedBy="sender", fetch="EAGER")
+     * @ORM\OneToMany(targetEntity=Order::class, mappedBy="sender")
      */
     private Collection $orders;
 
     /**
-     * @ORM\OneToMany(targetEntity=Picker::class, mappedBy="client", fetch="EAGER")
+     * @ORM\OneToMany(targetEntity=Picker::class, mappedBy="client")
      */
     private Collection $pickers;
 
     /**
-     * @ORM\OneToMany(targetEntity=Picker::class, mappedBy="preparer", fetch="EAGER")
+     * @ORM\OneToMany(targetEntity=Picker::class, mappedBy="preparer")
      */
     private Collection $clients;
 

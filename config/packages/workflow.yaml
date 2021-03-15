@@ -65,7 +65,7 @@ framework:
                 - exported # The preparation has been exported to a picker
                 - sent # The preparation has been done by the picker
                 - received # The preparation has been received by the sender
-                - retroceeded # The preparation has sent a retrocession order
+                - retroceded # The preparation has sent a retrocession order
                 - closed # The preparation is closed
             # Workflow transitions from a state to an other
             transitions:
@@ -78,9 +78,9 @@ framework:
                 to_received:
                     from: sent
                     to: received
-                to_retroceeded:
+                to_retroceded:
                     from: received
-                    to: retroceeded
+                    to: retroceded
                 to_closed:
-                    from: [ received , retroceeded ]
+                    from: [ received , retroceded ]
                     to: closed

@@ -59,7 +59,7 @@ class OrderRow
     private bool $medicine;
 
     /**
-     * @ORM\OneToOne(targetEntity=Preparation::class, inversedBy="orderRow", fetch="EAGER", cascade={"persist"})
+     * @ORM\OneToOne(targetEntity=Preparation::class, mappedBy="orderRow", fetch="EAGER", cascade={"persist"})
      */
     private ?Preparation $preparation;
 

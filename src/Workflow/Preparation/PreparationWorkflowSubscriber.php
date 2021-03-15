@@ -10,6 +10,7 @@ namespace App\Workflow\Preparation;
 
 
 use App\Entity\Preparation;
+use App\Entity\Retrocession;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Workflow\Event\Event;
@@ -95,6 +96,37 @@ class PreparationWorkflowSubscriber implements EventSubscriberInterface
     }
 
     /**
+     * Create a retrocession if needed, save it and send it
+     *
+     * @param Event $event
+     */
+    public function retrocede(Event $event): void
+    {
+        /** @var Preparation $preparation */
+        $preparation = $event->getSubject();
+        if ($preparation->isRetrocession() && $preparation->getRetrocession() === null) {
+            $retrocession = new Retrocession();
+            $retrocession->setPreparation($preparation);
+            //TODO CREATE THEN SAVE THEN SEND THE SET SENT THEN SAVE IT AGAIN
+            $retrocession->setSent(true);
+            $this->em->persist($retrocession);
+            $this->em->flush();
+        }
+    }
+
+    /**
+     * Save the entity
+     *
+     * @param Event $event
+     */
+    public function onRetroceded(Event $event): void
+    {
+        /** @var Preparation $preparation */
+        $preparation = $event->getSubject();
+        $this->em->getRepository(Preparation::class)->updateState($preparation);
+    }
+
+    /**
      * Set the preparation as closed and save it
      *
      * @param Event $event
@@ -129,6 +161,8 @@ class PreparationWorkflowSubscriber implements EventSubscriberInterface
             'workflow.preparation.entered.exported' => 'onExported',
             'workflow.preparation.entered.sent' => 'onSent',
             'workflow.preparation.entered.received' => 'onReceived',
+            'workflow.preparation.enter.retroceded' => 'retrocede',
+            'workflow.preparation.entered.retroceded' => 'onRetroceded',
             'workflow.preparation.enter.closed' => 'close',
             'workflow.preparation.entered.closed' => 'onClosed',
         );

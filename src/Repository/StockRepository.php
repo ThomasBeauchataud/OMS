@@ -55,9 +55,11 @@ class StockRepository extends ServiceEntityRepository
 
     /**
      * @param Order $order
+     * @param Sender|null $sender
+     * @param Entity|null $entity
      * @return Stock[]
      */
-    public function findBySenderEntityProducts(Order $order): array
+    public function findBySenderEntityProducts(Order $order, Sender $sender = null, Entity $entity = null): array
     {
         $products = array_map(function (OrderRow $orderRow) {
             return $orderRow->getProduct();
@@ -66,8 +68,8 @@ class StockRepository extends ServiceEntityRepository
             ->where('st.entity = :entity')
             ->andWhere('st.sender = :sender')
             ->andWhere('st.product IN (:products)')
-            ->setParameter('sender', $order->getSender())
-            ->setParameter('entity', $order->getTransmitter()->getEntity())
+            ->setParameter('sender', $sender ?? $order->getSender())
+            ->setParameter('entity', $entity ?? $order->getTransmitter()->getEntity())
             ->setParameter('products', $products)
             ->getQuery()
             ->getResult();
@@ -81,17 +83,18 @@ class StockRepository extends ServiceEntityRepository
     /**
      * @param OrderRow $orderRow
      * @param Sender|null $sender
+     * @param Entity|null $entity
      * @return Stock|null
      * @throws NonUniqueResultException
      */
-    public function findBySenderEntityProduct(OrderRow $orderRow, Sender $sender = null): ?Stock
+    public function findBySenderEntityProduct(OrderRow $orderRow, Sender $sender = null, Entity $entity = null): ?Stock
     {
         return $this->createQueryBuilder('st')
             ->where('st.entity = :entity')
             ->andWhere('st.sender = :sender')
             ->andWhere('st.product = :product')
-            ->setParameter('sender', $sender === null ? $orderRow->getOrder()->getSender() : $sender)
-            ->setParameter('entity', $orderRow->getOrder()->getTransmitter()->getEntity())
+            ->setParameter('sender', $sender ?? $orderRow->getOrder()->getSender())
+            ->setParameter('entity', $entity ?? $orderRow->getOrder()->getTransmitter()->getEntity())
             ->setParameter('product', $orderRow->getProduct())
             ->getQuery()
             ->getOneOrNullResult();

@@ -45,17 +45,17 @@ class Picker
     private Sender $client;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Sender::class, inversedBy="client")
+     * @ORM\ManyToOne(targetEntity=Sender::class, inversedBy="clients", fetch="EAGER")
      */
     private Sender $preparer;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Entity::class)
+     * @ORM\ManyToOne(targetEntity=Entity::class, fetch="EAGER")
      */
     private Entity $clientEntity;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Entity::class)
+     * @ORM\ManyToOne(targetEntity=Entity::class, fetch="EAGER")
      */
     private Entity $preparerEntity;
 

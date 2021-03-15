@@ -52,13 +52,14 @@ class PreparationFactory
     public function create(Order $order): array
     {
         $sender = $order->getSender();
-        $pickers = iterator_to_array($sender->getPickers());
-        usort($pickers, function(Picker $pk1, Picker $pk2) {
+        $client = $order->getTransmitter()->getEntity();
+        $pickers = $this->em->getRepository(Picker::class)->findBy(['clientEntity' => $client, 'client' => $sender]);
+        usort($pickers, function (Picker $pk1, Picker $pk2) {
             return $pk1->getPriority() <=> $pk2->getPriority();
         });
         $preparations = array();
         /** @var Stock[] $stocks */
-        $stocks = $this->em->getRepository(Stock::class)->findBySenderEntityProducts($order);
+        $stocks = $this->em->getRepository(Stock::class)->findBySenderEntityProducts($order, $sender, $client);
         /** @var OrderRow $orderRow */
         foreach ($order->getOrderRows() as $orderRow) {
             $senderStock = array_key_exists($orderRow->getProduct(), $stocks) ? $stocks[$orderRow->getProduct()]->getRealQuantity() : 0;
@@ -69,7 +70,10 @@ class PreparationFactory
                 }
                 /** @var Picker $picker */
                 foreach ($pickers as $picker) {
-                    $pickerStock = $this->getSenderStock($picker->getPreparer(), $orderRow); //TODO GET AVAILABLE PICKING STOCK DEFINED BY THE ENTITY AND NOT THE REAL STOCK
+                    /** @var ?Stock $pickerStock */
+                    $pickerStock = $this->em->getRepository(Stock::class)
+                        ->findBySenderEntityProduct($orderRow, $picker->getPreparer(), $picker->getPreparerEntity());
+                    $pickerStock = $pickerStock === null ? 0 : $pickerStock->getRealQuantity(); //TODO GET AVAILABLE PICKING STOCK DEFINED BY THE ENTITY AND NOT THE REAL STOCK
                     if ($pickerStock <= 0) {
                         continue;
                     }
